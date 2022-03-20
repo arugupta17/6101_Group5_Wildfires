@@ -25,6 +25,7 @@ cali_fires = dbGetQuery(conn=connection, statement=paste("SELECT * FROM 'Fires' 
 rainfall <- read.csv("/Users/sumanth/Downloads/6101_Project_Data/rainfall_daily.csv")
 soilmoisture <- read.csv("/Users/sumanth/Downloads/6101_Project_Data/soilmoisture_daily.csv")
 airtemp <- read.csv("/Users/sumanth/Downloads/6101_Project_Data/airtemp_daily.csv")
+fire_budget <- read.csv("/Users/sumanth/Downloads/fire_suppression.csv")
 ```
 
 Data Cleaning
@@ -63,7 +64,8 @@ Finally, we combine our data into one comprehensive dataset.
 ```{r}
 joined1 <- merge(cleaned_airtemp, cleaned_soilmoisture, by.x="Year", by.y="Year")
 joined2 <- merge(joined1, cleaned_rainfall, by.x="Year", by.y="Year")
-final_wildfire <- merge(joined2, cleaned_fires, by.x="Year", by.y="FIRE_YEAR")
+joined3 <- merge(joined2, fire_budget, by.x="Year", by.y="Year")
+final_wildfire <- merge(joined3, cleaned_fires, by.x="Year", by.y="FIRE_YEAR")
 ```
 
 ```{r}
