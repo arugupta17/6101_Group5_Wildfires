@@ -1,5 +1,5 @@
 ---
-title: "WildFire_Project"
+title: "WildFire_Project Analysis"
 author: "Aru Gupta"
 # date: "today"
 date: "`r Sys.Date()`"
@@ -81,4 +81,13 @@ final_wildfire <- merge(joined3, cleaned_fires, by.x="Year", by.y="FIRE_YEAR")
 ```{r}
 nrow(final_wildfire)
 ncol(final_wildfire)
+View(final_wildfire)
 ```
+
+-----------------------------------------------------------------------------------------------------
+```{r init, include=F}}
+library('ezids')
+
+
+```
+
