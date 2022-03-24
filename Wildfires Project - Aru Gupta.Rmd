@@ -87,7 +87,109 @@ View(final_wildfire)
 -----------------------------------------------------------------------------------------------------
 ```{r init, include=F}}
 library('ezids')
+```
+
+##Five Point Summary 
+```{r, results="asis"}
+xkablesummary(final_wildfire)
+```
+
+## HISTOGRAMS
+```{r, results="markup"}
 
 
+library(ggplot2)
+
+#Average Temperature
+TempHist <- ggplot(final_wildfire, aes(Avg_Temp))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="light blue 2") +
+  labs(x="Avg. Temp (C)", y="Frequency", title="HISTOGRAM: Average Temprature") 
+
+
+#Average Soil Moisture
+SoilHist <- ggplot(final_wildfire, aes(Avg_SoilMoisture))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="orange red 2") +
+  labs(x="Avg. Soil Moisture", y="Frequency", title="HISTOGRAM: Average Soil Moisture") 
+
+#Average Rainfall
+RainHist <- ggplot(final_wildfire, aes(Avg_Rainfall))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="green 3") +
+  labs(x="Avg. Rainfall", y="Frequency", title="HISTOGRAM: Average Rainfall") 
+
+#Wildfire Count by Year
+CountHist <- ggplot(final_wildfire, aes(Year))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="yellow", stat="count") +
+  labs(x="Years", y="Frequency of Wildfires", title="Wildfires count by year", )
+
+grid.arrange(TempHist, SoilHist, RainHist,CountHist, ncol=2, nrow=2)
+```
+
+
+##Boxplots
+```{r}
+
+#Average Temperature
+loadPkg("ggplot2")
+TempBox <- ggplot(final_wildfire, aes(y= Avg_Temp)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="light blue 2", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Temperature boxplot using `ggplot`")
+
+#Average Soil Moisture
+SoilBox <- ggplot(final_wildfire, aes(y= Avg_SoilMoisture)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="orange red 2", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Soil Moisture boxplot using `ggplot`")
+
+#Average Rainfall
+RainBox <- ggplot(final_wildfire, aes(y= Avg_Rainfall)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="green 3", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Rainfall boxplot using `ggplot`")
+
+#Fire Size
+ggplot(final_wildfire, aes(y= FIRE_SIZE)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="green 3", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Rainfall boxplot using `ggplot`")
+
+
+
+grid.arrange(TempBox, SoilBox, RainBox, ncol=3)
+
+```
+
+
+##Bar Graphs
+```{r}
+
+#Fire Size
+FireBar <- ggplot(data = final_wildfire, aes(x = FIRE_SIZE_CLASS)) +
+  geom_bar(col="black", fill="orange")+
+  labs(x="Fire Size Class", y="Frequency", title="Frequency of Wildfires by Size Classes") 
+
+#Years
+YearseBar <- ggplot(data = final_wildfire, aes(x = Year)) +
+  geom_bar(col="black", fill="yellow")+
+  labs(x="Years", y="Frequency", title="Frequency of Wildfires by Year") 
+
+#Budget
+BudgetBar <- ggplot(data = final_wildfire, aes(x = Budget)) +
+  geom_bar(col="black", fill="Pink 2")+
+  labs(x="Budget", y="Frequency", title="Frequency of Wildfires by Budget")
+
+
+grid.arrange(FireBar, YearseBar, BudgetBar, nrow=3)
+
+```
+
+
+
+
+##Scatter Plots
+```{r Q11, echo=F}
+ggplot(data=final_wildfire)+
+  geom_point(mapping = aes(x=Year, y=Budget, color=Year))+
+  ggtitle("Scatter plot of baseball player weigth(y, lbs) vs height(x, inches)")
 ```
 
