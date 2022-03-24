@@ -188,8 +188,10 @@ grid.arrange(FireBar, YearseBar, BudgetBar, nrow=3)
 
 ##Scatter Plots
 ```{r Q11, echo=F}
+
 ggplot(data=final_wildfire)+
   geom_point(mapping = aes(x=Year, y=Budget, color=Year))+
   ggtitle("Scatter plot of baseball player weigth(y, lbs) vs height(x, inches)")
+
 ```
 
