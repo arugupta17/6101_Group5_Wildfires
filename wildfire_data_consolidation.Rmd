@@ -26,6 +26,7 @@ rainfall <- read.csv("rainfall_daily.csv")
 soilmoisture <- read.csv("soilmoisture_daily.csv")
 airtemp <- read.csv("airtemp_daily.csv")
 fire_budget <- read.csv("fire_suppression.csv")
+dbDisconnect(connection)
 ```
 
 Data Cleaning
@@ -50,7 +51,7 @@ str(cleaned_airtemp)
 '
 
 
-
+summary(cleaned_fires)
 
 str(cleaned_airtemp)
 ```
@@ -88,12 +89,14 @@ Finally, we combine our data into one comprehensive dataset.
 joined1 <- merge(cleaned_airtemp, cleaned_soilmoisture, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
 joined2 <- merge(joined1, cleaned_rainfall, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
 str(joined2)
+joined2$year=as.integer(joined2$year)
+joined2$DOY=as.integer(joined2$DOY)
 
-str(final_wildfire)
 
 final_wildfire <- merge(fire_budget, cleaned_fires, by.x="Year", by.y="FIRE_YEAR")
 final_wildfire$existDay = final_wildfire$CONT_DATE- final_wildfire$DISCOVERY_DATE
-final_wildfire=merge(final_wildfire,joined2,by.x=c('Year','DISCOVERY_DOY'),by.y=c('year','DOY'))
+
+final_wildfire=merge(final_wildfire,joined2,by.x=c('Year','DISCOVERY_DOY'),by.y=c('year','DOY'),all.x=TRUE)
 str(final_wildfire)
 summary(final_wildfire)
 ```
@@ -101,5 +104,17 @@ summary(final_wildfire)
 ```{r}
 nrow(final_wildfire)
 ncol(final_wildfire)
+final_wildfire$STAT_CAUSE_CODE=as.factor(final_wildfire$STAT_CAUSE_CODE)
+
 str(final_wildfire)
+
+table(final_wildfire$month)
+
+table(final_wildfire$Year)
+table(final_wildfire$STAT_CAUSE_DESCR)
+
+fire_nature=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Lightning','Miscellaneous','Debris Burning'),]
+table(fire_nature$month)
+fire_peoplecause=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Arson','Campfire','Equipment Use','Fireworks','Powerline','Railroad','Smoking','Structue'),]
+table(fire_peoplecause$month)
 ```
