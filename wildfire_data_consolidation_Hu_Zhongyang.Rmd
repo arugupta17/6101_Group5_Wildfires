@@ -118,3 +118,11 @@ table(fire_nature$month)
 fire_peoplecause=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Arson','Campfire','Equipment Use','Fireworks','Powerline','Railroad','Smoking','Structue'),]
 table(fire_peoplecause$month)
 ```
+create summary by month
+
+
+
+```{r}
+
+
+```
