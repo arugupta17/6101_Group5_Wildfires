@@ -38,7 +38,6 @@ boxplot(n~Year,summary_nature)
 boxplot(n~month,summary_nature)
 
 
-
 ```
 ```{r}
 boxplot(FIRE_SIZE~Year,summary_peoplecaused)
@@ -54,7 +53,16 @@ mean(summary_nature$FIRE_SIZE)
 
 
 ```
+```{r}
+boxplot(tair_day_livneh_vic~Year,summary_peoplecaused)
+boxplot(tair_day_livneh_vic~month,summary_peoplecaused)
 
+boxplot(soilmoist1_day_livneh_vic~Year,summary_peoplecaused)
+boxplot(soilmoist1_day_livneh_vic~month,summary_peoplecaused)
+
+boxplot(rainfall_day_livneh_vic~Year,summary_peoplecaused)
+boxplot(rainfall_day_livneh_vic~month,summary_peoplecaused)
+```
 ```{r}
 library(stringr)
 temp=str_remove(summary_nature$Budget,"[$]")
@@ -75,7 +83,7 @@ corrplot(cor_people,method='number')
 ```
 
 
-create model
+create model for nature reason
 
 ```{r}
 model1=lm(n~tair_day_livneh_vic,data=summary_nature)
@@ -90,9 +98,12 @@ summary(model3)
 library(car)
 vif(model3)
 vif(model2)
-model4=lm(n~tair_day_livneh_vic+rainfall_day_livneh_vic,data=summary_nature)
-vif(model4)
+model4=lm(n~soilmoist1_day_livneh_vic,data=summary_nature)
+
 summary(model4)
 
 residualPlot(model2)
+
+model5=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=summary_nature)
+residualPlot(model5)
 ```
