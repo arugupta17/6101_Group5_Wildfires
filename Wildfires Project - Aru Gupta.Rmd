@@ -133,7 +133,7 @@ grid.arrange(TempHist, SoilHist, RainHist,CountHist, ncol=2, nrow=2)
 
 
 ##Boxplots
-```{r}
+```{r, results="markup"}
 
 #Average Temperature
 loadPkg("ggplot2")
@@ -168,7 +168,7 @@ grid.arrange(TempBox, SoilBox, RainBox, ncol=3)
 
 
 ##Bar Graphs
-```{r}
+```{r, results="markup"}
 
 #Fire Size
 FireBar <- ggplot(data = final_wildfire, aes(x = FIRE_SIZE_CLASS)) +
@@ -211,3 +211,16 @@ ggplot(final_wildfire, aes(x = Year, y = Budget)) +
 
 ```
 
+
+##Pie Charts
+```{r, results="markup"}
+lbls <- c("A", "B", "C", "D", "E", "F", "G", "E")
+pie((table(final_wildfire$FIRE_SIZE_CLASS)), labels = lbls, col=rainbow(length(lbls)), main="Pie Chart of Fire Size Class")
+
+```
+
+```{r, results="markup"}
+lbls <- c("Lightning", "Eqipment Use", "Smoking", "Campfire", "Debris Burning", "Railroad", "Arson", "Children", "Misc." )
+pie((table(final_wildfire$STAT_CAUSE_DESCR)), labels = lbls, col=rainbow(length(lbls)), main="Pie Chart of Wildfire Cause")
+
+```
