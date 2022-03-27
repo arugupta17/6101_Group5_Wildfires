@@ -8,15 +8,12 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-ggplot(a,aes(sample=gpa)) + geom_qq() + geom_qq_line()  + ggtitle("Gpa of admitted students(a)")
-ggplot(a,aes(sample=gre)) + geom_qq() + geom_qq_line()  + ggtitle("Gre of admitted students(a)")
-
 ## R Markdown
 
 #qqplots of Avg_Temp.
 
 ```{r, results='markup'}
+library(ggplot2)
 ggplot(cleaned_airtemp,aes(sample=Avg_Temp))+ 
 geom_qq()+ 
 geom_qq_line()+
