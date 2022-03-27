@@ -56,10 +56,43 @@ mean(summary_nature$FIRE_SIZE)
 ```
 
 ```{r}
-cor_nature=cor(summary_nature[c(4:8)])
+library(stringr)
+temp=str_remove(summary_nature$Budget,"[$]")
+temp=str_remove_all(temp,"[,]")
+summary_nature$Budget=as.numeric(temp)
+temp=str_remove(summary_peoplecaused$Budget,"[$]")
+temp=str_remove_all(temp,"[,]")
+summary_peoplecaused$Budget=as.numeric(temp)
+cor_nature=cor(summary_nature[c(4:9)])
 
 library(corrplot)
 corrplot(cor_nature,method='number')
+cor_people=cor(summary_peoplecaused[c(4:9)])
 
 
+corrplot(cor_people,method='number')
+
+```
+
+
+create model
+
+```{r}
+model1=lm(n~tair_day_livneh_vic,data=summary_nature)
+summary(model1)
+
+model2=lm(n~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=summary_nature)
+
+summary(model2)
+model3=lm(n~tair_day_livneh_vic+soilmoist1_day_livneh_vic+rainfall_day_livneh_vic,data=summary_nature)
+summary(model3)
+
+library(car)
+vif(model3)
+vif(model2)
+model4=lm(n~tair_day_livneh_vic+rainfall_day_livneh_vic,data=summary_nature)
+vif(model4)
+summary(model4)
+
+residualPlot(model2)
 ```
