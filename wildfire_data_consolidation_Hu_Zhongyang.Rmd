@@ -113,9 +113,9 @@ table(final_wildfire$month)
 table(final_wildfire$Year)
 table(final_wildfire$STAT_CAUSE_DESCR)
 
-fire_nature=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Lightning','Miscellaneous','Debris Burning'),]
+fire_nature=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Lightning','Miscellaneous','Missing/Undefined'),]
 table(fire_nature$month)
-fire_peoplecause=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Arson','Campfire','Equipment Use','Fireworks','Powerline','Railroad','Smoking','Structue'),]
+fire_peoplecause=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Arson','Campfire','Children','Debris Buring','Equipment use','Firework','Powerline','Railroad','Smoking','Structure'),]
 table(fire_peoplecause$month)
 ```
 create summary by month
@@ -143,5 +143,12 @@ joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
 temp3=fire_nature %>% count(Year, month)
 joined3=merge(joined3,temp3,by.x=c('Year','month'),by.y=c('Year','month'))
 temp3=aggregate(FIRE_SIZE~Year+month,data=fire_nature,mean)
+
 summary_nature=merge(joined3,temp3,by.x=c('Year','month'),by.y=c('Year','month'))
+summary_nature=merge(summary_nature,fire_budget,by.x='Year',by.y='Year')
+summary_peoplecaused=merge(summary_peoplecaused,fire_budget,by.x='Year',by.y='Year')
+
+write.csv(summary_nature,'summary_nature.csv')
+write.csv(summary_peoplecaused,'summary_peoplecaused.csv')
+write.csv(final_wildfire,'final_wildfire.csv')
 ```
