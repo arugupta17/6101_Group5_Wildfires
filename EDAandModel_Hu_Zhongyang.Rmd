@@ -1,0 +1,56 @@
+---
+title: "EDA_Hu_Zhongyang"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r }
+final_fire=read.csv('final_wildfire.csv')
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+library(ggplot2)
+hist(summary_nature$FIRE_SIZE)
+hist(summary_peoplecaused$FIRE_SIZE)
+```
+
+
+```{r}
+boxplot(n~Year,summary_peoplecaused)
+boxplot(n~month,summary_peoplecaused)
+
+boxplot(n~Year,summary_nature)
+boxplot(n~month,summary_nature)
+
+
+
+```
+```{r}
+boxplot(FIRE_SIZE~Year,summary_peoplecaused)
+boxplot(FIRE_SIZE~month,summary_peoplecaused)
+
+boxplot(FIRE_SIZE~Year,summary_nature)
+boxplot(FIRE_SIZE~month,summary_nature)
+
+print('the mean of fire size of people caused is')
+mean(summary_peoplecaused$FIRE_SIZE)
+print('the mean of fire size of natural reasons is')
+mean(summary_nature$FIRE_SIZE)
+
+
+```
