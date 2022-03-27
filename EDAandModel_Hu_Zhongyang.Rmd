@@ -54,3 +54,12 @@ mean(summary_nature$FIRE_SIZE)
 
 
 ```
+
+```{r}
+cor_nature=cor(summary_nature[c(4:8)])
+
+library(corrplot)
+corrplot(cor_nature,method='number')
+
+
+```
