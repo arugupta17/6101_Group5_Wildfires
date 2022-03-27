@@ -27,6 +27,7 @@ You can also embed plots, for example:
 library(ggplot2)
 hist(summary_nature$FIRE_SIZE)
 hist(summary_peoplecaused$FIRE_SIZE)
+
 ```
 
 
