@@ -51,39 +51,37 @@ ggplot() +geom_point(data=temp_plot, aes(x=Year, y=nfire), colour='blue') + geom
 
 ```{r, results='markup' }
 library(ggpubr)
-a=ggplot(summary_peoplecaused, mapping=aes(x=Year,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of people-caused fires for different years')+ylab('Number of Fires')
+ggplot(summary_peoplecaused, mapping=aes(x=Year,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of people-caused fires for different years')+ylab('Number of Fires')
 
-b=ggplot(summary_peoplecaused, mapping=aes(x=month,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of people-caused fires for different months')+ylab('Number of Fires')
-c=ggplot(summary_nature, mapping=aes(x=Year,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of fires caused by other reasons for different years')+ylab('Number of Fires')
+ggplot(summary_peoplecaused, mapping=aes(x=month,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of people-caused fires for different months')+ylab('Number of Fires')
+ggplot(summary_nature, mapping=aes(x=Year,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of fires caused by other reasons for different years')+ylab('Number of Fires')
 
-d=ggplot(summary_nature, mapping=aes(x=month,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of fires caused by other reasons for different months')+ylab('Number of Fires')
-ggarrange(a,b,c,d, 
-          labels = c("A", "B", "C",'D'),
-          ncol = 2, nrow = 2)
-```
-```{r}
-boxplot(FIRE_SIZE~Year,summary_peoplecaused)
-boxplot(FIRE_SIZE~month,summary_peoplecaused)
-
-boxplot(FIRE_SIZE~Year,summary_nature)
-boxplot(FIRE_SIZE~month,summary_nature)
-
-print('the mean of fire size of people caused is')
-mean(summary_peoplecaused$FIRE_SIZE)
-print('the mean of fire size of natural reasons is')
-mean(summary_nature$FIRE_SIZE)
-
+ggplot(summary_nature, mapping=aes(x=month,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of fires caused by other reasons for different months')+ylab('Number of Fires')
 
 ```
 ```{r}
-boxplot(tair_day_livneh_vic~Year,summary_peoplecaused)
-boxplot(tair_day_livneh_vic~month,summary_peoplecaused)
+ggplot(summary_peoplecaused, mapping=aes(x=Year,y=temperature)) + geom_boxplot()+ggtitle('box-plot of temperature for different years')+ylab('temperature')
 
-boxplot(soilmoist1_day_livneh_vic~Year,summary_peoplecaused)
-boxplot(soilmoist1_day_livneh_vic~month,summary_peoplecaused)
+ggplot(summary_peoplecaused, mapping=aes(x=month,y=temperature)) + geom_boxplot()+ggtitle('box-plot of temperature for different months')+ylab('temperature')
+ggplot(summary_nature, mapping=aes(x=Year,y=soilmoisture)) + geom_boxplot()+ggtitle('box-plot of soil moisture for different years')+ylab('soil moisture')
 
-boxplot(rainfall_day_livneh_vic~Year,summary_peoplecaused)
-boxplot(rainfall_day_livneh_vic~month,summary_peoplecaused)
+ggplot(summary_nature, mapping=aes(x=month,y=soilmoisture)) + geom_boxplot()+ggtitle('box-plot of soil moisture for different months')+ylab('soil moisture')
+ggplot(summary_nature, mapping=aes(x=Year,y=rainfall)) + geom_boxplot()+ggtitle('box-plot of rainfall for different years')+ylab('average daily rainfall')
+
+ggplot(summary_nature, mapping=aes(x=month,y=rainfall)) + geom_boxplot()+ggtitle('box-plot of rainfall for different months')+ylab('average daily rainfall')
+
+```
+```{r}
+summary(aov(nfire~Year,summary_peoplecaused))
+summary(aov(nfire~month,summary_peoplecaused))
+summary(aov(nfire~Year,summary_nature))
+summary(aov(nfire~month,summary_nature))
+summary(aov(temperature~Year,summary_peoplecaused))
+summary(aov(temperature~month,summary_peoplecaused))
+summary(aov(soilmoisture~Year,summary_nature))
+summary(aov(soilmoisture~month,summary_nature))
+summary(aov(rainfall~Year,summary_nature))
+summary(aov(rainfall~month,summary_nature))
 ```
 ```{r}
 library(stringr)
@@ -102,10 +100,10 @@ cor_people=cor(summary_peoplecaused[c(4:9)])
 
 corrplot(cor_people,method='number')
 summary_nature$total=summary_nature$n+summary_peoplecaused$n
-cor_total=cor(summary_nature[c(4:10)])
+cor_total=cor(summary_nature[c(4,5,6,8,9,10)])
 
 
-corrplot(cor_total,method='number')
+corrplot(cor_total,method='number',type = 'lower', diag = TRUE)
 ```
 
 
@@ -113,25 +111,27 @@ create model for nature reason
 
 ```{r}
 
-model1=lm(n~tair_day_livneh_vic,data=summary_nature)
+model1=lm(total~temperature,data=summary_nature)
 summary(model1)
 
-model2=lm(n~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=summary_nature)
+model2=lm(total~temperature+soilmoisture,data=summary_nature)
 
 summary(model2)
-model3=lm(n~tair_day_livneh_vic+soilmoist1_day_livneh_vic+rainfall_day_livneh_vic,data=summary_nature)
+model3=lm(total~temperature+soilmoisture+rainfall,data=summary_nature)
 summary(model3)
 
 library(car)
 vif(model3)
 vif(model2)
-model4=lm(n~soilmoist1_day_livneh_vic,data=summary_nature)
+model4=lm(total~soilmoisture,data=summary_nature)
 
 summary(model4)
 
 residualPlot(model2)
 
-model5=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=summary_nature)
+model5=lm(log(total)~temperature+soilmoisture,data=summary_nature)
 residualPlot(model5)
 plot(model5)
+summary(model5)
+vif(model5)
 ```
