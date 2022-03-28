@@ -25,6 +25,7 @@ geom_qq()+
 geom_qq_line()+
 theme_minimal()+
 ggtitle("Airtemp_norm_distribution_Year")
+
 ```
 
 #qqplots of fire_size.
@@ -39,6 +40,7 @@ geom_qq()+
 geom_qq_line()+
 theme_minimal()+
 ggtitle("FIRE_SIZE_norm_distribution_CAUSE")
+
 ```
 
 #qqplots of avg_rainfall.
@@ -53,10 +55,12 @@ geom_qq()+
 geom_qq_line()+
 theme_minimal()+
 ggtitle("Avg_Rainfall_norm_distribution_Year")
+str(cleaned_rainfall)
 ```
 
 #qqplots of soilmoisture.
 ```{r, results='markup'}
+library(ggplot2)
 ggplot(cleaned_soilmoisture,aes(sample=Avg_SoilMoisture))+ 
 geom_qq()+ 
 geom_qq_line()+
@@ -67,4 +71,9 @@ geom_qq()+
 geom_qq_line()+
 theme_minimal()+
 ggtitle("Avg_SoilMoisture_norm_distribution_Year")
+
+str(cleaned_airtemp)
+str(cleaned_fires)
+str(cleaned_rainfall)
+str(cleaned_soilmoisture)
 ```
