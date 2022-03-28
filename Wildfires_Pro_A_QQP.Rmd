@@ -9,9 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ## R Markdown
-
+```{r, results='markup'}
+library(ggplot2)
+```
 #qqplots of Avg_Temp.
-
 ```{r, results='markup'}
 library(ggplot2)
 ggplot(cleaned_airtemp,aes(sample=Avg_Temp))+ 
