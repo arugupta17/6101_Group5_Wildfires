@@ -16,7 +16,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE)
 library('ezids')
 library(stringr)
 ```
@@ -37,7 +37,7 @@ Avg_Rainfall <- WildfireData$rainfall_day_livneh_vic
 
 ```
 
-##Five Point Summary 
+## Summary for dataset
 ```{r, results="asis"}
 temp=str_remove(fire_budget$Budget,"[$]")
 temp=str_remove_all(temp,"[,]")
@@ -51,7 +51,7 @@ xkablesummary(WildfireData)
 
 ```
 
-## HISTOGRAMS
+HISTOGRAMS
 
 ```{r, results="markup"}
 
@@ -84,7 +84,7 @@ ggsave("Histograms.jpg", plot = Histograms)
 ```
 
 
-##Bar Graphs
+Bar Graphs
 ```{r, results="markup"}
 
 #Fire Size
@@ -109,11 +109,11 @@ grid.arrange(FireBar, YearsBar, nrow=2)
 
 ```
 
-##Pie Charts
+Pie Charts
 ```{r, results="markup"}
 lbls <- c("A", "B", "C", "D", "E", "F", "G", "E")
 jpeg("sizeclasspie.jpeg")
-sizeclasspie<- pie((table(WildfireData$FIRE_SIZE_CLASS)), col=rainbow(length(lbls)), main="Pie Chart of Fire Size Class")
+pie((table(WildfireData$FIRE_SIZE_CLASS)), col=rainbow(length(lbls)), main="Pie Chart of Fire Size Class")
 
 ```
 
@@ -122,7 +122,7 @@ sizeclasspie<- pie((table(WildfireData$FIRE_SIZE_CLASS)), col=rainbow(length(lbl
 jpeg("cause_descrpPie.jpeg")
 
 lbls <- c("Lightning", "Eqipment Use", "Smoking", "Campfire", "Debris Burning", "Railroad", "Arson", "Children", "Misc." )
-cause_descrpPie <- pie((table(WildfireData$STAT_CAUSE_DESCR)), col=rainbow(length(lbls)), main="Pie Chart of Wildfire Cause")
+pie((table(WildfireData$STAT_CAUSE_DESCR)), col=rainbow(length(lbls)), main="Pie Chart of Wildfire Cause")
 
 ```
 
@@ -146,9 +146,8 @@ ggplot(dat, aes(x=Year, y=FIRE_SIZE, group=1)) + geom_line() + ggtitle("Wildfire
 
 ```
 
-## R Markdown
-Hu Zhongyang part
-intialize data
+## EDA
+
 
 ```{r }
 final_fire=read.csv('final_wildfire.csv')
@@ -170,7 +169,7 @@ summary_nature$Year=as.factor(summary_nature$Year)
 summary_nature$month=as.factor(summary_nature$month)
 ```
 
-## Including Plots
+#Box-plot of Annually and Monthly Summary
 
 plot the year trend
 
@@ -210,6 +209,11 @@ ggplot(summary_nature, mapping=aes(x=Year,y=rainfall)) + geom_boxplot()+ggtitle(
 ggplot(summary_nature, mapping=aes(x=month,y=rainfall)) + geom_boxplot()+ggtitle('box-plot of rainfall for different months')+ylab('average daily rainfall')
 
 ```
+
+The result of box-plot suppose the annually summary for all variables(fires number, temperature rainfall and moisture) are consistent and monthly summary for all variables are different. It supposes that we could need to 
+take anova test for the mean with those categories.
+
+## Hypothesis testing
 
 Setting up different groups for the first hypothesis test. We are looking to compare different
 classes of wildfires and how different conditions may have been.
@@ -288,6 +292,19 @@ summary(aov(rainfall~Year,summary_nature))
 summary(aov(rainfall~month,summary_nature))
 ```
 
+
+
+We have the null hypothesis that the mean of particular varible with different categories is same
+and the alternative hypothesis suppose that mean of particular varible with different categories is different
+The anova test give the results
+For all of variables with annually categories, we failed to reject the null hypothesis
+For all of variables with monthly categories, we reject the null hypothesis.
+
+The result suppose the variables(fires number, temperature, rainfall and moisture) are consistent with year and
+have great difference with months
+
+
+## Correlation Check
 try to make correlation check with numeric variable
 ```{r}
 temp=str_remove(summary_nature$Budget,"[$]")
@@ -311,8 +328,12 @@ cor_total=cor(summary_nature[c(4,5,6,8,9,10)])
 corrplot(cor_total,method='number',type = 'lower', diag = TRUE)
 ```
 
+The result suppose that fires number for both type(man-caused and other) has strong correlation with temperature and moisture. This implies that we could make model to evaluate the influece of nature factors.
 
-create model for nature reason
+
+
+## Model
+create model for fires and high correlated variable
 and check their summary, use vif to determine the variable useage
 
 use residual plot and qq-plot to check their normality
@@ -342,3 +363,10 @@ plot(model5)
 summary(model5)
 vif(model5)
 ```
+
+Try the different setting on model: model with temperature; temperature and moisture,temperature 
+moisture and rainfall. The vif check find the inflation of factors with 3 variables. Then the best factor set is temperatre and moisture. The model is also ploted with residual, the residual mean is strongly curved. Then Apply with log transformation with the fire number, the results is better. The gg-plot suppose the approximate normal for the residual. The model has the r-square of 0.89 and the F-test for p-value: < 2.2e-16. Both results suppose the model can strongly predict the monthly wildfire case by monthly average temperature and average soil moisture.
+
+
+
+
