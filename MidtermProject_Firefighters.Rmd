@@ -21,6 +21,20 @@ library('ezids')
 ```
 
 
+```{r }
+WildfireData <- read.csv('final_wildfire.csv')
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+```
+
+```{r}
+
+Avg_Temp <- WildfireData$tair_day_livneh_vic
+Avg_SoilMoisture <- WildfireData$soilmoist1_day_livneh_vic
+Avg_Rainfall <- WildfireData$rainfall_day_livneh_vic
+
+```
+
 ##Five Point Summary 
 ```{r, results="asis"}
 xkablesummary(WildfireData)
