@@ -9,37 +9,57 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+intialize data
 
 ```{r }
 final_fire=read.csv('final_wildfire.csv')
 summary_nature=read.csv('summary_nature.csv')
 summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+colnames(summary_nature)[4]='temperature'
+colnames(summary_nature)[5]='soilmoisture'
+colnames(summary_nature)[6]='rainfall'
+colnames(summary_nature)[7]='nfire'
+colnames(summary_peoplecaused)[4]='temperature'
+colnames(summary_peoplecaused)[5]='soilmoisture'
+colnames(summary_peoplecaused)[6]='rainfall'
+colnames(summary_peoplecaused)[7]='nfire'
+summary_peoplecaused$Year=as.factor(summary_peoplecaused$Year)
+
+summary_peoplecaused$month=as.factor(summary_peoplecaused$month)
+summary_nature$Year=as.factor(summary_nature$Year)
+
+summary_nature$month=as.factor(summary_nature$month)
 ```
 
 ## Including Plots
 
-You can also embed plots, for example:
+plot the year trend
 
-```{r pressure, echo=FALSE}
+```{r , results='markup'}
 library(ggplot2)
-hist(summary_nature$FIRE_SIZE)
-hist(summary_peoplecaused$FIRE_SIZE)
-table(final_fire$STAT_CAUSE_DESCR)
+
+temp_plot=aggregate(nfire~Year,summary_nature,sum)
+
+temp_plot2=aggregate(nfire~Year,summary_peoplecaused,sum)
+
+ggplot() +geom_point(data=temp_plot, aes(x=Year, y=nfire), colour='blue') + geom_point(data=temp_plot2, aes(x=Year, y=nfire),colour='red')+labs(title='Number of Fires Each Year (red for people caused fire bule for other reasons)',y='Number of Fires')
+
+
 
 ```
 
 
-```{r}
-boxplot(n~Year,summary_peoplecaused)
-boxplot(n~month,summary_peoplecaused)
+```{r, results='markup' }
+library(ggpubr)
+a=ggplot(summary_peoplecaused, mapping=aes(x=Year,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of people-caused fires for different years')+ylab('Number of Fires')
 
-boxplot(n~Year,summary_nature)
-boxplot(n~month,summary_nature)
+b=ggplot(summary_peoplecaused, mapping=aes(x=month,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of people-caused fires for different months')+ylab('Number of Fires')
+c=ggplot(summary_nature, mapping=aes(x=Year,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of fires caused by other reasons for different years')+ylab('Number of Fires')
 
-
+d=ggplot(summary_nature, mapping=aes(x=month,y=nfire)) + geom_boxplot()+ggtitle('box-plot of number of fires caused by other reasons for different months')+ylab('Number of Fires')
+ggarrange(a,b,c,d, 
+          labels = c("A", "B", "C",'D'),
+          ncol = 2, nrow = 2)
 ```
 ```{r}
 boxplot(FIRE_SIZE~Year,summary_peoplecaused)
@@ -81,13 +101,18 @@ cor_people=cor(summary_peoplecaused[c(4:9)])
 
 
 corrplot(cor_people,method='number')
+summary_nature$total=summary_nature$n+summary_peoplecaused$n
+cor_total=cor(summary_nature[c(4:10)])
 
+
+corrplot(cor_total,method='number')
 ```
 
 
 create model for nature reason
 
 ```{r}
+
 model1=lm(n~tair_day_livneh_vic,data=summary_nature)
 summary(model1)
 
@@ -108,4 +133,5 @@ residualPlot(model2)
 
 model5=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=summary_nature)
 residualPlot(model5)
+plot(model5)
 ```
