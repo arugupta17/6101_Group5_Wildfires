@@ -18,6 +18,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library('ezids')
+library(stringr)
 ```
 
 
@@ -25,6 +26,7 @@ library('ezids')
 WildfireData <- read.csv('final_wildfire.csv')
 summary_nature=read.csv('summary_nature.csv')
 summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+fire_budget  <- read.csv("fire_suppression.csv")
 ```
 
 ```{r}
@@ -37,7 +39,16 @@ Avg_Rainfall <- WildfireData$rainfall_day_livneh_vic
 
 ##Five Point Summary 
 ```{r, results="asis"}
+temp=str_remove(fire_budget$Budget,"[$]")
+temp=str_remove_all(temp,"[,]")
+fire_budget$Budget=as.numeric(temp)
+
+temp=str_remove(WildfireData$Budget,"[$]")
+temp=str_remove_all(temp,"[,]")
+WildfireData$Budget=as.numeric(temp)
+
 xkablesummary(WildfireData)
+
 ```
 
 ## HISTOGRAMS
@@ -115,6 +126,25 @@ cause_descrpPie <- pie((table(WildfireData$STAT_CAUSE_DESCR)), col=rainbow(lengt
 
 ```
 
+```{r}
+library(dplyr)
+library(ggplot2)
+yearly_count <- WildfireData %>% count(Year)
+colnames(yearly_count) <- c("Year", "Count")
+ggplot(yearly_count, aes(x=Year, y=Count, group=1)) + geom_line() + ggtitle("Yearly Recorded Fires")
+```
+```{r}
+temp=str_remove(fire_budget$Budget,"[$]")
+temp=str_remove_all(temp,"[,]")
+fire_budget$Budget=as.numeric(temp)
+ggplot(fire_budget, aes(x=Year, y=Budget, group=1)) + geom_line() + ggtitle("California Fire Suppression Budget 1979-2021")
+```
+
+```{r}
+dat <- aggregate(FIRE_SIZE ~ Year, WildfireData, mean)
+ggplot(dat, aes(x=Year, y=FIRE_SIZE, group=1)) + geom_line() + ggtitle("Wildfire Sizes (1992-2013)") + ylab("Fire Size")
+
+```
 
 ## R Markdown
 Hu Zhongyang part
@@ -151,7 +181,7 @@ temp_plot=aggregate(nfire~Year,summary_nature,sum)
 
 temp_plot2=aggregate(nfire~Year,summary_peoplecaused,sum)
 
-ggplot() +geom_point(data=temp_plot, aes(x=Year, y=nfire), colour='blue') + geom_point(data=temp_plot2, aes(x=Year, y=nfire),colour='red')+labs(title='Number of Fires Each Year (red for people caused fire bule for other reasons)',y='Number of Fires')
+ggplot() +geom_point(data=temp_plot, aes(x=Year, y=nfire), colour='blue') + geom_point(data=temp_plot2, aes(x=Year, y=nfire),colour='red')+labs(title='Number of Fires Each Year (Red for people-caused, Blue for other reasons)',y='Number of Fires')
 
 
 
@@ -181,6 +211,69 @@ ggplot(summary_nature, mapping=aes(x=month,y=rainfall)) + geom_boxplot()+ggtitle
 
 ```
 
+Setting up different groups for the first hypothesis test. We are looking to compare different
+classes of wildfires and how different conditions may have been.
+```{r}
+classA <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'A',]
+classB <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'B',]
+classC <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'C',]
+classD <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'D',]
+classE <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'E',]
+classF <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'F',]
+classG <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'G',]
+```
+
+When comparing the conditions during the smallest wildfires to the largest wildfires,
+it  appears that air temperature was lower, soil moisture was higher, and rainfall was
+higher during less  intense wildfires.
+
+```{r}
+t.test(classA$tair_day_livneh_vic, classG$tair_day_livneh_vic, var.equal = TRUE)
+t.test(classA$soilmoist1_day_livneh_vic, classG$soilmoist1_day_livneh_vic, var.equal = TRUE)
+t.test(classA$rainfall_day_livneh_vic, classG$rainfall_day_livneh_vic, var.equal = TRUE)
+```
+```{r}
+code1 <- WildfireData[WildfireData$STAT_CAUSE_CODE == 1,]
+code2 <- WildfireData[WildfireData$STAT_CAUSE_CODE == 2,]
+code7 <- WildfireData[WildfireData$STAT_CAUSE_CODE == 7,]
+```
+Now,  we will compare different groups of wildfires- categorized by their causes
+
+Code 1: Lightning
+Code 2: Equipment Use
+Code 7: Arson
+
+When looking  at  the wildfires caused by  Lightning versus those caused by Equipment
+Use,  average temperature, soil moisture, and rainfall in CA were significantly  different.
+In particular, during Lighting-caused wildfires, air temperature  was higher, soil moisture
+was lower, and rainfall was higher.
+```{r}
+t.test(code1$tair_day_livneh_vic, code2$tair_day_livneh_vic, var.equal=TRUE)
+t.test(code1$soilmoist1_day_livneh_vic, code2$soilmoist1_day_livneh_vic, var.equal=TRUE)
+t.test(code1$rainfall_day_livneh_vic, code2$rainfall_day_livneh_vic, var.equal=TRUE)
+```
+
+When comparing the wildfires caused by Lightning versus those caused by Arson,
+it appears that the air temperature, soil moisture, and average rainfall in CA
+were significantly different. In  particular, during lightning-caused wildfires,
+air temperature was higher, soil moisture was lower, and average rainfall
+was higher.
+```{r}
+t.test(code1$tair_day_livneh_vic, code7$tair_day_livneh_vic, var.equal=TRUE)
+t.test(code1$soilmoist1_day_livneh_vic, code7$soilmoist1_day_livneh_vic, var.equal=TRUE)
+t.test(code1$rainfall_day_livneh_vic, code7$rainfall_day_livneh_vic, var.equal=TRUE)
+```
+When looking at conditions during arson-caused wildfires versus equipment use-caused
+wildfires, it appears that air  temperature and soil moisture were significantly  different.
+In  particular, during arson-caused fires, air temperature was lower and soil moisture was
+higher.
+```{r}
+t.test(code7$tair_day_livneh_vic, code2$tair_day_livneh_vic, var.equal=TRUE)
+t.test(code7$soilmoist1_day_livneh_vic, code2$soilmoist1_day_livneh_vic, var.equal=TRUE)
+t.test(code7$rainfall_day_livneh_vic, code2$rainfall_day_livneh_vic, var.equal=TRUE)
+
+```
+
 Do Anova test on the year and month statistics
 ```{r}
 summary(aov(nfire~Year,summary_peoplecaused))
@@ -197,7 +290,6 @@ summary(aov(rainfall~month,summary_nature))
 
 try to make correlation check with numeric variable
 ```{r}
-library(stringr)
 temp=str_remove(summary_nature$Budget,"[$]")
 temp=str_remove_all(temp,"[,]")
 summary_nature$Budget=as.numeric(temp)
