@@ -45,7 +45,7 @@ xkablesummary(WildfireData)
 ```{r, results="markup"}
 
 library(ggplot2)
-
+library(gridExtra)
 #Average Temperature
 TempHist <- ggplot(WildfireData, aes(Avg_Temp))+ 
   geom_histogram(binwidth = 0.5, bins = 100, col="black", fill="light blue 2") +
