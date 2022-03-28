@@ -17,8 +17,89 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library('ezids')
 ```
 
+
+##Five Point Summary 
+```{r, results="asis"}
+xkablesummary(WildfireData)
+```
+
+## HISTOGRAMS
+
+```{r, results="markup"}
+
+library(ggplot2)
+
+#Average Temperature
+TempHist <- ggplot(WildfireData, aes(Avg_Temp))+ 
+  geom_histogram(binwidth = 0.5, bins = 100, col="black", fill="light blue 2") +
+  labs(x="Avg. Temp (C)", y="Frequency", title="HISTOGRAM: Average Temprature") 
+
+
+#Average Soil Moisture
+SoilHist <- ggplot(WildfireData, aes(Avg_SoilMoisture))+ 
+  geom_histogram(binwidth = 0.5, bins = 100, col="black", fill="orange red 2") +
+  labs(x="Avg. Soil Moisture", y="Frequency", title="HISTOGRAM: Average Soil Moisture") 
+
+#Average Rainfall
+RainHist <- ggplot(WildfireData, aes(Avg_Rainfall))+ 
+  geom_histogram(binwidth = 0.5, bins = 100, col="black", fill="green 3") +
+  labs(x="Avg. Rainfall", y="Frequency", title="HISTOGRAM: Average Rainfall") 
+
+#Wildfire Count by Year
+CountHist <- ggplot(WildfireData, aes(Year))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="yellow", stat="count") +
+  labs(x="Years", y="Frequency of Wildfires", title="Wildfires count by year", )
+
+Histograms <- grid.arrange(TempHist, SoilHist, RainHist, CountHist, ncol=2, nrow=2)
+
+ggsave("Histograms.jpg", plot = Histograms)
+```
+
+
+##Bar Graphs
+```{r, results="markup"}
+
+#Fire Size
+FireBar <- ggplot(data = WildfireData, aes(x = FIRE_SIZE_CLASS)) +
+  geom_bar(col="black", fill="orange")+
+  labs(x="Fire Size Class", y="Frequency", title="Frequency of Wildfires by Size Classes") 
+
+
+#Years
+YearsBar <- ggplot(data = WildfireData, aes(x = Year)) +
+  geom_bar(col="black", fill="yellow")+
+  labs(x="Years", y="Frequency", title="Frequency of Wildfires by Year")
+
+#Budget
+BudgetBar <- ggplot(data = WildfireData, aes(x = Budget)) +
+  geom_bar(col="black", fill="Pink 2")+
+  labs(x="Budget", y="Frequency", title="Frequency of Wildfires by Budget")
+
+
+grid.arrange(FireBar, YearsBar, nrow=2)
+
+
+```
+
+##Pie Charts
+```{r, results="markup"}
+lbls <- c("A", "B", "C", "D", "E", "F", "G", "E")
+jpeg("sizeclasspie.jpeg")
+sizeclasspie<- pie((table(WildfireData$FIRE_SIZE_CLASS)), col=rainbow(length(lbls)), main="Pie Chart of Fire Size Class")
+
+```
+
+```{r, results="markup"}
+
+jpeg("cause_descrpPie.jpeg")
+
+lbls <- c("Lightning", "Eqipment Use", "Smoking", "Campfire", "Debris Burning", "Railroad", "Arson", "Children", "Misc." )
+cause_descrpPie <- pie((table(WildfireData$STAT_CAUSE_DESCR)), col=rainbow(length(lbls)), main="Pie Chart of Wildfire Cause")
+
+```
 
 
 ## R Markdown
