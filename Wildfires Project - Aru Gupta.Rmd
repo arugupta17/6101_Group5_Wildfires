@@ -31,7 +31,7 @@ library("RSQLite")
 connection <- dbConnect(drv=RSQLite::SQLite(), dbname="/Users/Arundhati/Documents/6101_Group5_Wildfires/wildfires_historic.sqlite")
 tables <- dbListTables(connection)
 tables <- tables[tables != "sqlite_sequence"]
-cali_fires = dbGetQuery(conn=connection, statement=paste("SELECT * FROM 'Fires' WHERE STATE = 'CA'"))
+#cali_fires = dbGetQuery(conn=connection, statement=paste("SELECT * FROM 'Fires' WHERE STATE = 'CA'"))
 rainfall <- read.csv("/Users/Arundhati/Documents/6101_Group5_Wildfires/rainfall_daily.csv")
 soilmoisture <- read.csv("/Users/Arundhati/Documents/6101_Group5_Wildfires/soilmoisture_daily.csv")
 airtemp <- read.csv("/Users/Arundhati/Documents/6101_Group5_Wildfires/airtemp_daily.csv")
@@ -88,6 +88,14 @@ View(final_wildfire)
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+```{r }
+final_fire=read.csv('final_wildfire.csv')
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+
+
+View('summary_nature.csv')
+```
 
 ```{r init, include=F}}
 library('ezids')
@@ -174,19 +182,23 @@ grid.arrange(TempBox, SoilBox, RainBox, ncol=3)
 FireBar <- ggplot(data = final_wildfire, aes(x = FIRE_SIZE_CLASS)) +
   geom_bar(col="black", fill="orange")+
   labs(x="Fire Size Class", y="Frequency", title="Frequency of Wildfires by Size Classes") 
+ggsave("FireBar.jpg", plot = FireBar)
 
 #Years
-YearseBar <- ggplot(data = final_wildfire, aes(x = Year)) +
+YearsBar <- ggplot(data = final_wildfire, aes(x = Year)) +
   geom_bar(col="black", fill="yellow")+
-  labs(x="Years", y="Frequency", title="Frequency of Wildfires by Year") 
+  labs(x="Years", y="Frequency", title="Frequency of Wildfires by Year")
+ggsave("YearsBar.jpg", plot = YearsBar)
 
 #Budget
 BudgetBar <- ggplot(data = final_wildfire, aes(x = Budget)) +
   geom_bar(col="black", fill="Pink 2")+
   labs(x="Budget", y="Frequency", title="Frequency of Wildfires by Budget")
+ggsave("BudgetBar.jpg", plot = BudgetBar)
 
 
-grid.arrange(FireBar, YearseBar, BudgetBar, nrow=3)
+barcharts <- grid.arrange(FireBar, YearsBar, nrow=2)
+ggsave("barcharts.jpg", plot = barcharts)
 
 ```
 
