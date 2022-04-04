@@ -21,6 +21,17 @@ library('ezids')
 library(stringr)
 ```
 # Chapter 1: Introduction of Project
+ 
+  California continues to experience longer wildfire seasons due to climate change. In the past couple of years, as the world navigated through the COVID-19 outbreak, Californians also had to deal with large wildfires. With rising concerns over climate change and its impact on our lives, our research aimed to study the causes and effects of wildfires and increase awareness of the issue. With an abundance of environmental data out there, we hoped to use some of it to come up with recommendations in terms of budget allocation and identify particular pain points. 
+
+	 The summary is organized in following chapters:
+	      1. Chapter 2: Description of Dataset
+	      2. Chapter 3: EDA of observations of wildfires
+	      3. Chapter 4: EDA of annually and monthly statistics
+	      4. Chapter 5: correlation and linear model, SMART questions
+	      5. Chapter 6: conclusion 
+	      
+  
 
 ```{r }
 WildfireData <- read.csv('final_wildfire.csv')
@@ -38,9 +49,13 @@ Avg_Rainfall <- WildfireData$rainfall_day_livneh_vic
 ```
 
 # Chapter 2: Discription of Dataset
-
+  The first dataset we found was composed of 1.88 million wildfires around the United States as recorded by the Fire Program Analysis (FPA) system. We not only needed to find a dataset that met the dataset size requirement, but also wanted to look into a problem with many records so that we could conduct wide-reaching analysis. Thus, we settled on analyzing wildfires all across California from 1992 to 2013. However, this dataset alone would not help us get into the level of detail that we hoped for. For example, most of the columns in this dataset detailed the same characteristics such as months, years, days, unit numbers, and unit ID’s. For our analysis, we required more data about the conditions during these fires for the purpose of potentially mitigating future wildfires in the same conditions. 
+For that reason, we drew from other datasets in hopes of a more comprehensive analysis. Luckily, an organization called Cal-Adapt collects different peer-reviewed datasets about California from various data publishers and provides them for download in one location. When looking at the available data, three features stood out: soil moisture, air temperature, and rainfall. Naturally, we felt that these metrics were important factors in determining whether or not a wildfire will occur and how large it will be. All three of these datasets came in daily form, so we had to aggregate them by month and year if we wanted to properly incorporate them into our main dataset with all the wildfires. 
+	  We also hypothesized that the California state budget for fire suppression would be an  interesting factor to observe over the years. Did increased/decreased spending have an impact on the frequency/intensity of wildfires over the years? We looked to answer this question in hopes of understanding how state government efforts were helping (or not) the wildfire situation in California. To incorporate this dataset into our main dataset, we merely merged them by year. 
+	  As a result, we had one comprehensive dataset with all of the features we initially wanted to look at (rainfall, air temperature, soil moisture, and California state budget) and how relevant they are to the sizes/frequencies of wildfires from 1992-2013. While there are surely many more potential causes of wildfires out there, we felt that these four factors would be a good start for some initial analysis.
+	  
 ## Summary for dataset
-```{r, results="asis"}
+```{r, results="markup"}
 temp=str_remove(fire_budget$Budget,"[$]")
 temp=str_remove_all(temp,"[,]")
 fire_budget$Budget=as.numeric(temp)
@@ -49,7 +64,7 @@ temp=str_remove(WildfireData$Budget,"[$]")
 temp=str_remove_all(temp,"[,]")
 WildfireData$Budget=as.numeric(temp)
 
-xkablesummary(WildfireData)
+str(WildfireData)
 
 ```
 
@@ -287,7 +302,7 @@ take anova test for the mean with those categories.
 
 
 Do Anova test on the year and month statistics
-```{r}
+```{r, results='markup'}
 summary(aov(nfire~Year,summary_peoplecaused))
 summary(aov(nfire~month,summary_peoplecaused))
 summary(aov(nfire~Year,summary_nature))
@@ -311,9 +326,16 @@ For all of variables with monthly categories, we reject the null hypothesis.
 The result suppose the variables(fires number, temperature, rainfall and moisture) are consistent with year and
 have great difference with months
 
+     With the aforementioned datasets, we found that, while they were somewhat useful for our analysis, they weren’t as granular as we hoped they would be. For example, the dataset containing California’s yearly budget for fire suppression could have also included how the money was partitioned across different causes/uses. That way, we would be able to provide more detailed recommendations on where some funds should be redistributed. As it stands, knowing how much money is being dedicated to combating wildfires in itself is not incredibly useful.
+	   We also noticed that our main dataset that contained records for every wildfire noted the cause for each of them. Some of them included arson, equipment use, lighting, and many others. However, we noticed in our analysis that miscellaneous causes accounted for the majority of the wildfires. Even a little more detail could have helped us with recommending mitigations. 
+In addition, the data dictionaries for our datasets regarding air temperature and soil moisture didn’t really detail what units the data was recorded in. Since we were dealing with data from California  in the United States, we could only assume that Fahrenheit was used but even then, the measurements seemed a bit lower than expected. As for soil moisture, we had to look into what the common unit for this metric was, which turned out to be in bars. 
+     Additional  information that would  have been useful is data about human patterns and activities and how they have potentially impacted the frequency/intensity of wildfires over the years. Studying the population growth and housing density in California over time in comparison to incidents of wildfires can provide increased understanding of the causes of human-caused wildfires
+We have observed the decreasing trend of people-caused fires from 1995-2013, we need some more data about the government actions on preventing the wildfire caused by human..
 
-## Correlation Check
-try to make correlation check with numeric variable
+# Chapter5: Correlation and Liner Regression model
+
+## 5.1 Correlation Matrix
+
 ```{r}
 temp=str_remove(summary_nature$Budget,"[$]")
 temp=str_remove_all(temp,"[,]")
@@ -324,19 +346,21 @@ summary_peoplecaused$Budget=as.numeric(temp)
 cor_nature=cor(summary_nature[c(4:9)])
 
 library(corrplot)
-corrplot(cor_nature,method='number')
+
 cor_people=cor(summary_peoplecaused[c(4:9)])
 
 
-corrplot(cor_people,method='number')
-summary_nature$total=summary_nature$n+summary_peoplecaused$n
-cor_total=cor(summary_nature[c(4,5,6,8,9,10)])
+
+colnames(summary_nature)[7]='nature_fire'
+summary_nature$people_caused_fires=summary_peoplecaused$n
+summary_nature$total=summary_nature$nature_fire+summary_peoplecaused$n
+cor_total=cor(summary_nature[c(4,5,6,9,7,10,11)])
 
 
 corrplot(cor_total,method='number',type = 'lower', diag = TRUE)
 ```
 
-The result suppose that fires number for both type(man-caused and other) has strong correlation with temperature and moisture. This implies that we could make model to evaluate the influece of nature factors.
+    From the EDA, we try to evaluate the wildfries in two cases: people-caused and other reason(usually natrual reason). The result suppose that fires number for both type(man-caused and other) has strong correlation with temperature and moisture. This implies that we could make model to evaluate the influence of nature factors to answer SMART question.
 
 
 
