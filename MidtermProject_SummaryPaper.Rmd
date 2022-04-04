@@ -400,7 +400,7 @@ t.test(code7$rainfall_day_livneh_vic, code2$rainfall_day_livneh_vic, var.equal=T
 
 # Chapter 7: Correlation and Liner Regression model
 
-## 7.1: Correlation Matrix
+## 7.1: Correlation Matrix 
 
 ```{r}
 temp=str_remove(summary_nature$Budget,"[$]")
@@ -420,7 +420,7 @@ cor_people=cor(summary_peoplecaused[c(4:9)])
 colnames(summary_nature)[7]='nature_fire'
 summary_nature$people_caused_fires=summary_peoplecaused$n
 summary_nature$total=summary_nature$nature_fire+summary_peoplecaused$n
-cor_total=cor(summary_nature[c(4,5,6,9,7,10,11)])
+cor_total=cor(summary_nature[c(4,5,6,8,9,7,10,11)])
 
 
 corrplot(cor_total,method='number',type = 'lower', diag = TRUE)
@@ -469,6 +469,18 @@ anova(model3)
 The log model result supposes the linear model with 0.87 r-squared and a 0 p-value of F-test, it supposes the coefficient for rainfall is not 0,  The estimated coefficient is -0.33. 
 From the model we can answer that the low soilmoisture could increase the number of wildfire cases.
 
+## 7.5 Smart Question: Did lower expenditure on fire supression in California result in larger wildfires?
+```{r}
+
+
+model4=lm(FIRE_SIZE~Budget,data=summary_nature)
+summary(model4)
+
+anova(model4)
+```
+From the correlation matrix, we have found there is a very weak correlation between cases of fire and expenditure. The further check by F-test of model give a p-value close to 0.
+We reject the null hypothesis that the coefficient of expenditure is zero. This imply the lower expenditure may result in larger wildfires. However, the r-squared is 0.05, it supposes that
+the budget is a bad explantory variable on predicting/explaining firesize.
 
 
 # Chapter 8: Conclusion
