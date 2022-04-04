@@ -107,9 +107,23 @@ temp=str_remove(WildfireData$Budget,"[$]")
 temp=str_remove_all(temp,"[,]")
 WildfireData$Budget=as.numeric(temp)
 
-str(WildfireData)
+xkablesummary(WildfireData)
 
 ```
+1. Year: the year of wildfire was discovered
+2. DISCOVAERY_DOY: the day of the year that the wildfire was discoverd
+3. DISCOVERY_DATE: the date of the wildfire was discoverd
+4. STAT_CAUSER_CODE: Assigned category for caused reason
+5. STAT_CAUSER_DESCR: caused reason
+6. CONT_DATE: the date of fire is under control
+7. CONT_DOY: the day of year the fire is under control
+8. FIRE_SIZE: the fire size
+9. FIRE_SIZE_CLASS: the assigned category of fire size
+10. exsDay: the number of days the fire existed
+11. tair_day_livneh_vic: average daily temperature
+12. month: the month the fire is discovered
+13. soilmoist1_day_livneh_vic: the average soilmoisture daily
+14. rainfall_day_livneh_vic: average daily rainfall
 
 # Chapter 4: EDA for Wildfire Observations
 
@@ -507,6 +521,6 @@ they are the factors to determine the risk of catch fire under risky situation.
 
 After exploring the data and conducting our tests, we concluded multiple conclusions. After looking into the effect of lower/higher air temperature and rainfall over the years, they didn't seem to have much effect on the surface, so we decided to split up the wildfires into groups based on class and cause. Regarding Class A (smaller) versus Class G (larger) fires, Class A is much more frequent, air temperature and rainfall are lower, and soil moisture is higher. This conclusion, however, seems fairly elementary, so we looked into wildfires by causes to investigate if conditions varied between them. During lightning-caused fires, air temperature and rainfall were higher, and soil moisture was lower than fires caused by equipment use and arson. During arson-caused fires, air temperature and rainfall were lower and soil moisture was higher than equipment use-caused fires. While arson is largely unpredictable and difficult to analyze, necessary precautions could be taken when it is raining to lower the chances that lightning causes fires. For example, removing dry leaves and foliage would be a good start. <br />
 
-We find the period of wildfires from  annually and monthly statistics. The wildfire cases is generally consistent with differnet years. And the monthly statistics on wildfires are quite different. In the correlation part, we find the climate period in a year serve as the main factors on the difference of wildfire cases. And another noticable phenamenon is that the environment factors also determine the cases of people caused wildfire. We are not have data about the human activities nearby the forest and could not give a clear conclusion that the risky behaviors by people happens equally each month. However, the high r-squared value supposes that the nature factors could be the main factors on determing the cases of wildfire.
+We find the period of wildfires from  annually and monthly statistics. The wildfire cases is generally consistent with differnet years. And the monthly statistics on wildfires are quite different. In the correlation part, we find the climate period in a year serve as the main variable on the difference of wildfire cases. And another noticable phenamenon is that the environment factors also determine the cases of people caused wildfire. We are not have data about the human activities nearby the forest and could not give a clear conclusion that the risky behaviors by people happens equally each month. However, the high r-squared value supposes that the nature factors could be the main factors on determing the cases of wildfire.
 
 In addition, after looking into the budget spending by California, it seems that it has been rising considerably over the last two decades. Still, the frequency and intensity of fires over the years hasn't changed. This begs the question- what exactly is the budget going towards, and where can some of it go instead? Had we been able to see how the budget was partitioned, we could have made recommendations based on our findings on where that funding should go. For now, we recommend the state of California evaluate carefully how that money is being spent, find ways to keep the soil moist and remove dry foliage from the ground.
