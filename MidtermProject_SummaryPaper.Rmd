@@ -236,7 +236,7 @@ summary_nature$Year=as.factor(summary_nature$Year)
 summary_nature$month=as.factor(summary_nature$month)
 ```
 
-## 6.1: Plots of Annual and Monthly Summary
+## 5.1: Plots of Annual and Monthly Summary
 
 ### 6.1.1: Plotting the year trend
 
@@ -254,7 +254,7 @@ ggplot() +geom_point(data=temp_plot, aes(x=Year, y=nfire), colour='blue') + geom
 ```
 
 
-### 6.1.2: Box-plots of year and month to show trend
+### 5.1.2: Box-plots of year and month to show trend
 
 ```{r, results='markup' }
 library(ggpubr)
@@ -289,7 +289,7 @@ ggplot(summary_nature, mapping=aes(x=month,y=rainfall)) + geom_boxplot()+ggtitle
 The result of box-plot suppose the annually summary for all variables(fires number, temperature rainfall and moisture) are consistent and monthly summary for all variables are different. It supposes that we could need to take anova test for the mean with those categories.
 
 
-## 6.2: Anova test on the year and month statistics
+## 5.2: Anova test on the year and month statistics
 ```{r, results='markup'}
 'test wildfire cases caused by people of different years'
 summary(aov(nfire~Year,summary_peoplecaused))
@@ -430,8 +430,9 @@ From the EDA, we try to evaluate the wildfires in two cases: people-caused and o
 
 
 
-## 6.2 Smart Question: Did the higher temperature increase the cases of wildfire in a month?
+
 ## 7.2 Smart Question: Did the higher temperature increase the cases of wildfire in a month?
+
 
 ```{r}
 
@@ -465,12 +466,13 @@ summary(model3)
 plot(model3)
 anova(model3)
 ```
-<<<<<<< HEAD
-Try the different setting on model: model with temperature; temperature and moisture,temperature 
-moisture and rainfall. The vif check find the inflation of factors with 3 variables. Then the best factor set is temperature and moisture. The model is also ploted with residual, the residual mean is strongly curved. Then Apply with log transformation with the fire number, the results is better. The gg-plot suppose the approximate normal for the residual. The model has the r-square of 0.89 and the F-test for p-value: < 2.2e-16. Both results suppose the model can strongly predict the monthly wildfire case by monthly average temperature and average soil moisture.
-=======
-
->>>>>>> adc5cdf6aa7ab630dec9c945c0e5a7b91418331a
+The log model result supposes the linear model with 0.87 r-squared and a 0 p-value of F-test, it supposes the coefficient for rainfall is not 0,  The estimated coefficient is -0.33. 
+From the model we can answer that the low soilmoisture could increase the number of wildfire cases.
 
 
 
+# Chapter 8: Conclusion
+
+After exploring the data and conducting our tests, we concluded multiple conclusions. After looking into the effect of lower/higher air temperature and rainfall over the years, they didn't seem to have much effect on the surface, so we decided to split up the wildfires into groups based on class and cause. Regarding Class A (smaller) versus Class G (larger) fires, Class A is much more frequent, air temperature and rainfall are lower, and soil moisture is higher. This conclusion, however, seems fairly elementary, so we looked into wildfires by causes to investigate if conditions varied between them. During lightning-caused fires, air temperature and rainfall were higher, and soil moisture was lower than fires caused by equipment use and arson. During arson-caused fires, air temperature and rainfall were lower and soil moisture was higher than equipment use-caused fires. While arson is largely unpredictable and difficult to analyze, necessary precautions could be taken when it is raining to lower the chances that lightning causes fires. For example, removing dry leaves and foliage would be a good start. <br />
+
+In addition, after looking into the budget spending by California, it seems that it has been rising considerably over the last two decades. Still, the frequency and intensity of fires over the years hasn't changed. This begs the question- what exactly is the budget going towards, and where can some of it go instead? Had we been able to see how the budget was partitioned, we could have made recommendations based on our findings on where that funding should go. For now, we recommend the state of California evaluate carefully how that money is being spent, find ways to keep the soil moist and remove dry foliage from the ground.
