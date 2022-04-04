@@ -238,7 +238,7 @@ summary_nature$month=as.factor(summary_nature$month)
 
 ## 5.1: Plots of Annual and Monthly Summary
 
-### 6.1.1: Plotting the year trend
+### 5.1.1: Plotting the year trend
 
 ```{r , results='markup'}
 library(ggplot2)
