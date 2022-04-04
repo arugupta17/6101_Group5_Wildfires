@@ -330,7 +330,7 @@ have great difference with months
 	   We also noticed that our main dataset that contained records for every wildfire noted the cause for each of them. Some of them included arson, equipment use, lighting, and many others. However, we noticed in our analysis that miscellaneous causes accounted for the majority of the wildfires. Even a little more detail could have helped us with recommending mitigations. 
 In addition, the data dictionaries for our datasets regarding air temperature and soil moisture didn’t really detail what units the data was recorded in. Since we were dealing with data from California  in the United States, we could only assume that Fahrenheit was used but even then, the measurements seemed a bit lower than expected. As for soil moisture, we had to look into what the common unit for this metric was, which turned out to be in bars. 
      Additional  information that would  have been useful is data about human patterns and activities and how they have potentially impacted the frequency/intensity of wildfires over the years. Studying the population growth and housing density in California over time in comparison to incidents of wildfires can provide increased understanding of the causes of human-caused wildfires
-We have observed the decreasing trend of people-caused fires from 1995-2013, we need some more data about the government actions on preventing the wildfire caused by human..
+We have observed the decreasing trend of people-caused fires from 1995-2013, we need some more data about preventing the wildfire caused by human..
 
 # Chapter5: Correlation and Liner Regression model
 
