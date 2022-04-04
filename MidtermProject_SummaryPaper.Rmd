@@ -20,18 +20,48 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE)
 library('ezids')
 library(stringr)
 ```
-# Chapter 1: Introduction of Project
- 
-  California continues to experience longer wildfire seasons due to climate change. In the past couple of years, as the world navigated through the COVID-19 outbreak, Californians also had to deal with large wildfires. With rising concerns over climate change and its impact on our lives, our research aimed to study the causes and effects of wildfires and increase awareness of the issue. With an abundance of environmental data out there, we hoped to use some of it to come up with recommendations in terms of budget allocation and identify particular pain points. 
-
 	 The summary is organized in following chapters:
-	      1. Chapter 2: Description of Dataset
-	      2. Chapter 3: EDA of observations of wildfires
-	      3. Chapter 4: EDA of annually and monthly statistics
-	      4. Chapter 5: correlation and linear model, SMART questions
-	      5. Chapter 6: conclusion 
-	      
+	      1. Chapter 1: Introduction of Project & SMART Questionis
+	      2. Chapter 2: Previous Research
+	      3. Chapter 3: Description of Dataset
+	      4. Chapter 4: EDA of Observations of Wildfires
+	      5. Chapter 5: EDA of Annually and Monthly Statistics & Hypothesis Testing
+	      6. Chapter 6: Correlation and Linear Model
+	      7. Chapter 7: Conclusion
+
+# Chapter 1: Introduction of Project & SMART Questions
+ 
+  California continues to experience longer wildfire seasons due to climate change. In the past couple of years, as the world navigated through the COVID-19 outbreak, Californians also had to deal with large wildfires. With rising concerns over climate change and its impact on our lives, our research aimed to study the causes and effects of wildfires and increase awareness of the issue. With an abundance of environmental data out there, we hoped to use some of it to come up with recommendations in terms of budget allocation and identify particular pain points. <br />
   
+Listed below are our SMART Questions. Due to the nature of our data, we wanted to investigate the conditions and causes of each wildfire to help figure out potential mitigations. We also wanted to look at how the budget played a factor in the frequency/intensity of the wildfires. With this initial look into how different variables play a factor into wildfires, we hoped to understand a bit more about what causes them and what recommendations to propose for mitigating them. <br />
+
+Did the annual number of wildfires in California increase with an increase in the temperature between 1992-2015?  <br />
+
+Did higher precipitation levels result in a smaller or fewer number of wildfires in California between 1992-2015?  <br />
+
+Did a lower fire suppression expenditure in California result in larger wildfires between 1992-2015?  <br />
+
+Did lower levels of soil moisture in California result in larger or more frequent wildfires between 1992-2015?
+
+
+	      
+ # Chapter 2: Previous Research
+
+One of the first papers we looked at was “Climate change and growth scenarios for California wildfire” which talked about how population growth may affect the the frequency and intensity of wildfires. According to the authors Westerling, Bryant, and Preisler in  human-induced climatic change and the increasing population in California are likely to impact large wildfires in the area directly. The research studied different scenarios for future population growth and wildland-urban interface relative to housing density and assessed the results for thirty years. In every scenario, there was an anticipated increased wildfire burned area which grew over time if the human-induced climatic change continues at the same intensity. <br />
+
+In the next paper, A Framework for Risk Assessment and Optimal Line Upgrade  Selection to Mitigate Wildfire Risk the authors Sofia Taylor  and Line A.  Roald claim that overhead lines pose some risk to igniting wildfires, so they outline different factors that contribute to whether or not overhead lines should be converted to underground cables to mitigate fire risk. They developed a model to weigh these factors for different overhead lines and recommended which to put underground. This is relative to our topic because we investigated the amount of wildfires that were caused by equipment use, which ranked higher than we anticipated. <br />
+
+Last but not least, we read about a paper where the researchers How-Hang Liu, Ronald Y. Chang, Yi-Ying Chen, and I-Kang Fu proposed the use of IoT (Internet of Things) sensors to detect wildfires by monitoring wind speed, soil wetness, biomass, and other factors to identify when a fire has started. We also investigated soil moisture to see if it was a contributing factor to the intensity or frequency of wildfires. <br />
+ <br />
+ 
+References
+Westerling, A.L., Bryant, B.P., Preisler, H.K. et al. Climate change and growth scenarios for California wildfire. Climatic Change 109, 445–463 (2011). https://doi.org/10.1007/s10584-011-0329-9 <br />
+<br />
+Taylor, Sofia, Roald, A. Line. A Framework for Risk Assessment and Optimal Line Upgrade  Selection to Mitigate Wildfire Risk. Arxiv (2021). https://arxiv.org/abs/2110.07348  <br />
+<br />
+Liu, How-Hang, Chang, Ronald Y., Chen, Yi-Ying, Fu, I-Kang. Sensor-Based Satellite IoT for Early Wildfire Detection. Arxiv  (2021). https://arxiv.org/abs/2109.10505 <br />
+
+
 
 ```{r }
 WildfireData <- read.csv('final_wildfire.csv')
@@ -48,11 +78,23 @@ Avg_Rainfall <- WildfireData$rainfall_day_livneh_vic
 
 ```
 
-# Chapter 2: Discription of Dataset
-  The first dataset we found was composed of 1.88 million wildfires around the United States as recorded by the Fire Program Analysis (FPA) system. We not only needed to find a dataset that met the dataset size requirement, but also wanted to look into a problem with many records so that we could conduct wide-reaching analysis. Thus, we settled on analyzing wildfires all across California from 1992 to 2013. However, this dataset alone would not help us get into the level of detail that we hoped for. For example, most of the columns in this dataset detailed the same characteristics such as months, years, days, unit numbers, and unit ID’s. For our analysis, we required more data about the conditions during these fires for the purpose of potentially mitigating future wildfires in the same conditions. 
-For that reason, we drew from other datasets in hopes of a more comprehensive analysis. Luckily, an organization called Cal-Adapt collects different peer-reviewed datasets about California from various data publishers and provides them for download in one location. When looking at the available data, three features stood out: soil moisture, air temperature, and rainfall. Naturally, we felt that these metrics were important factors in determining whether or not a wildfire will occur and how large it will be. All three of these datasets came in daily form, so we had to aggregate them by month and year if we wanted to properly incorporate them into our main dataset with all the wildfires. 
-	  We also hypothesized that the California state budget for fire suppression would be an  interesting factor to observe over the years. Did increased/decreased spending have an impact on the frequency/intensity of wildfires over the years? We looked to answer this question in hopes of understanding how state government efforts were helping (or not) the wildfire situation in California. To incorporate this dataset into our main dataset, we merely merged them by year. 
-	  As a result, we had one comprehensive dataset with all of the features we initially wanted to look at (rainfall, air temperature, soil moisture, and California state budget) and how relevant they are to the sizes/frequencies of wildfires from 1992-2013. While there are surely many more potential causes of wildfires out there, we felt that these four factors would be a good start for some initial analysis.
+# Chapter 3: Description of Dataset
+  The first dataset we found was composed of 1.88 million wildfires around the United States as recorded by the Fire Program Analysis (FPA) system. We not only needed to find a dataset that met the dataset size requirement, but also wanted to look into a problem with many records so that we could conduct wide-reaching analysis. Thus, we settled on analyzing wildfires all across California from 1992 to 2013. However, this dataset alone would not help us get into the level of detail that we hoped for. For example, most of the columns in this dataset detailed the same characteristics such as months, years, days, unit numbers, and unit ID’s. For our analysis, we required more data about the conditions during these fires for the purpose of potentially mitigating future wildfires in the same conditions. <br />
+  
+For that reason, we drew from other datasets in hopes of a more comprehensive analysis. Luckily, an organization called Cal-Adapt collects different peer-reviewed datasets about California from various data publishers and provides them for download in one location. When looking at the available data, three features stood out: soil moisture, air temperature, and rainfall. Naturally, we felt that these metrics were important factors in determining whether or not a wildfire will occur and how large it will be. All three of these datasets came in daily form, so we had to aggregate them by month and year if we wanted to properly incorporate them into our main dataset with all the wildfires. <br />
+
+	  We also hypothesized that the California state budget for fire suppression would be an  interesting factor to observe over the years. Did increased/decreased spending have an impact on the frequency/intensity of wildfires over the years? We looked to answer this question in hopes of understanding how state government efforts were helping (or not) the wildfire situation in California. To incorporate this dataset into our main dataset, we merely merged them by year. <br />
+	  
+	  As a result, we had one comprehensive dataset with all of the features we initially wanted to look at (rainfall, air temperature, soil moisture, and California state budget) and how relevant they are to the sizes/frequencies of wildfires from 1992-2013. While there are surely many more potential causes of wildfires out there, we felt that these four factors would be a good start for some initial analysis. However, our dataset did have some limitations. <br />
+	  
+	  With the aforementioned datasets, we found that, while they were somewhat useful for our analysis, they weren’t as granular as we hoped they would be. For example, the dataset containing California’s yearly budget for fire suppression could have also included how the money was partitioned across different causes/uses. That way, we would be able to provide more detailed recommendations on where some funds should be redistributed. As it stands, knowing how much money is being dedicated to combating wildfires in itself is not incredibly useful. <br />
+	  
+    We also noticed that our main dataset that contained records for every wildfire noted the cause for each of them. Some of them included arson, equipment use, lighting, and many others. However, we noticed in our analysis that miscellaneous causes accounted for the majority of the wildfires. Even a little more detail could have helped us with recommending mitigations. <br />
+    
+In addition, the data dictionaries for our datasets regarding air temperature and soil moisture didn’t really detail what units the data was recorded in. Since we were dealing with data from California  in the United States, we could only assume that Fahrenheit was used but even then, the measurements seemed a bit lower than expected. As for soil moisture, we had to look into what the common unit for this metric was, which turned out to be in bars. <br />
+
+Additional information that would  have been useful is data about human patterns and activities and how they have potentially impacted the frequency/intensity of wildfires over the years. Studying the population growth and housing density in California over time in comparison to incidents of wildfires can provide increased understanding of the causes of human-caused wildfires. 
+
 	  
 ## Summary for dataset
 ```{r, results="markup"}
@@ -68,7 +110,7 @@ str(WildfireData)
 
 ```
 
-# Chapter 3: EDA and hypothesis testing for Wildfire Observations
+# Chapter 4: EDA and hypothesis testing for Wildfire Observations
 HISTOGRAMS
 
 ```{r, results="markup"}
@@ -163,16 +205,14 @@ dat <- aggregate(FIRE_SIZE ~ Year, WildfireData, mean)
 ggplot(dat, aes(x=Year, y=FIRE_SIZE, group=1)) + geom_line() + ggtitle("Wildfire Sizes (1992-2013)") + ylab("Fire Size")
 
 ```
+After the EDA, we came away with several thoughts. One of the first metrics we wanted to look into was the California yearly budget for fire suppression. Wildfires have been an issue in this state for many years, so looking at whether or not the funding for wildfire suppression was helping was an important part of our analysis. After visualizing the budget below and seeing that it ballooned to over $1 billion over the past couple years, our question about whether or not increased spending helped mitigate wildfires quickly turned into: what was the money going towards? Other than that, our previous questions only got a little more granular. It was clear to see that soil moisture, rainfall, and air temperature didn’t have much effect on the frequency of wildfires from 1992-2015. But we still wanted to know if the conditions during each class and cause of fire differed and by how much. <br />
 
 
 
-
-
-
-## Hypothesis testing
-
-Setting up different groups for the first hypothesis test. We are looking to compare different
-classes of wildfires and how different conditions may have been.
+## Hypothesis Testing
+To investigate how the conditions differed during each class and cause of fire, we used Hypothesis testing- specifically t-tests.
+We first had to split the wildfires up into different groups for the first hypothesis test. We looked to compare different
+classes of wildfires and how different conditions may have been. Classes A-G  describe the size of the fire with Class A being the smallest and Class G being the largest.
 ```{r}
 classA <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'A',]
 classB <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'B',]
@@ -185,7 +225,7 @@ classG <- WildfireData[WildfireData$FIRE_SIZE_CLASS == 'G',]
 
 When comparing the conditions during the smallest wildfires to the largest wildfires,
 it  appears that air temperature was lower, soil moisture was higher, and rainfall was
-higher during less  intense wildfires.
+higher during less intense wildfires.
 
 ```{r}
 t.test(classA$tair_day_livneh_vic, classG$tair_day_livneh_vic, var.equal = TRUE)
@@ -197,11 +237,11 @@ code1 <- WildfireData[WildfireData$STAT_CAUSE_CODE == 1,]
 code2 <- WildfireData[WildfireData$STAT_CAUSE_CODE == 2,]
 code7 <- WildfireData[WildfireData$STAT_CAUSE_CODE == 7,]
 ```
-Now,  we will compare different groups of wildfires- categorized by their causes
+Now, we will compare different groups of wildfires- categorized by their causes. <br />
 
-Code 1: Lightning
-Code 2: Equipment Use
-Code 7: Arson
+Code 1: Lightning <br />
+Code 2: Equipment Use <br />
+Code 7: Arson <br />
 
 When looking  at  the wildfires caused by  Lightning versus those caused by Equipment
 Use,  average temperature, soil moisture, and rainfall in CA were significantly  different.
@@ -234,7 +274,7 @@ t.test(code7$rainfall_day_livneh_vic, code2$rainfall_day_livneh_vic, var.equal=T
 
 ```
 
-# Chapter 4: EDA for monthly and annually statistics of wildfire: scatterplot, box-plot and ANOVA
+# Chapter 5: EDA for monthly and annually statistics of wildfire: scatterplot, box-plot and ANOVA
 
 ```{r }
 final_fire=read.csv('final_wildfire.csv')
@@ -326,15 +366,9 @@ For all of variables with monthly categories, we reject the null hypothesis.
 The result suppose the variables(fires number, temperature, rainfall and moisture) are consistent with year and
 have great difference with months
 
-     With the aforementioned datasets, we found that, while they were somewhat useful for our analysis, they weren’t as granular as we hoped they would be. For example, the dataset containing California’s yearly budget for fire suppression could have also included how the money was partitioned across different causes/uses. That way, we would be able to provide more detailed recommendations on where some funds should be redistributed. As it stands, knowing how much money is being dedicated to combating wildfires in itself is not incredibly useful.
-	   We also noticed that our main dataset that contained records for every wildfire noted the cause for each of them. Some of them included arson, equipment use, lighting, and many others. However, we noticed in our analysis that miscellaneous causes accounted for the majority of the wildfires. Even a little more detail could have helped us with recommending mitigations. 
-In addition, the data dictionaries for our datasets regarding air temperature and soil moisture didn’t really detail what units the data was recorded in. Since we were dealing with data from California  in the United States, we could only assume that Fahrenheit was used but even then, the measurements seemed a bit lower than expected. As for soil moisture, we had to look into what the common unit for this metric was, which turned out to be in bars. 
-     Additional  information that would  have been useful is data about human patterns and activities and how they have potentially impacted the frequency/intensity of wildfires over the years. Studying the population growth and housing density in California over time in comparison to incidents of wildfires can provide increased understanding of the causes of human-caused wildfires
-We have observed the decreasing trend of people-caused fires from 1995-2013, we need some more data about preventing the wildfire caused by human..
+# Chapter 6: Correlation and Liner Regression model
 
-# Chapter5: Correlation and Liner Regression model
-
-## 5.1 Correlation Matrix
+## 6.1 Correlation Matrix
 
 ```{r}
 temp=str_remove(summary_nature$Budget,"[$]")
@@ -360,11 +394,11 @@ cor_total=cor(summary_nature[c(4,5,6,9,7,10,11)])
 corrplot(cor_total,method='number',type = 'lower', diag = TRUE)
 ```
 
-    From the EDA, we try to evaluate the wildfries in two cases: people-caused and other reason(usually natrual reason). The result suppose that fires number for both type(man-caused and other) has strong correlation with temperature and moisture. This implies that we could make model to evaluate the influence of nature factors to answer SMART question.
+    From the EDA, we try to evaluate the wildfires in two cases: people-caused and other reason(usually natrual reason). The result suppose that fires number for both type(man-caused and other) has strong correlation with temperature and moisture. This implies that we could make model to evaluate the influence of nature factors to answer SMART question.
 
 
 
-## Model
+## 6.2 Model
 create model for fires and high correlated variable
 and check their summary, use vif to determine the variable useage
 
@@ -397,4 +431,10 @@ vif(model5)
 ```
 
 Try the different setting on model: model with temperature; temperature and moisture,temperature 
-moisture and rainfall. The vif check find the inflation of factors with 3 variables. Then the best factor set is temperatre and moisture. The model is also ploted with residual, the residual mean is strongly curved. Then Apply with log transformation with the fire number, the results is better. The gg-plot suppose the approximate normal for the residual. The model has the r-square of 0.89 and the F-test for p-value: < 2.2e-16. Both results suppose the model can strongly predict the monthly wildfire case by monthly average temperature and average soil moisture.
+moisture and rainfall. The vif check find the inflation of factors with 3 variables. Then the best factor set is temperature and moisture. The model is also ploted with residual, the residual mean is strongly curved. Then Apply with log transformation with the fire number, the results is better. The gg-plot suppose the approximate normal for the residual. The model has the r-square of 0.89 and the F-test for p-value: < 2.2e-16. Both results suppose the model can strongly predict the monthly wildfire case by monthly average temperature and average soil moisture.
+
+# Chapter 7: Conclusion
+
+After exploring the data and conducting our own tests, we came to several conclusions. After looking into the effect of lower/higher air temperature and rainfall over the years, they didn't seem to have much effect on the surface, which is why we decided to split up the wildfires into groups based on class and cause. When it comes to Class A (smaller) versus Class G (larger) fires, Class A are much more frequent, air temperature and rainfall are usually lower and soil moisture is usually higher. This conclusion, however, seems fairly elementary so we looked into wildfires by causes to investigate if conditions varied between them. During lightning-caused fires, air temperature and rainfall was higher and soil moisture was lower than during fires caused by equipment use and arson. During arson-caused fires, air temperature and rainfall were lower and soil moisture was higher than equipment use-caused fires. While arson is largely unpredictable and difficult to analyze, necessary precautions could be taken when it is raining to lower the chances that lightning causes fires. For example, removing dry leaves and foliage would be a good start. <br />
+
+In addition, after looking into the budget spending by California, it seems that it has been rising considerably over the last two decades, but the frequency and intensity of fires over the years hasn't really changed. This begs the question- what exactly is the budget going towards, and where can some of it go instead? Had we been able to see how the budget was partitioned, we could have made recommendations based on our findings as to where that funding should really go. For now, we recommend the state of California to evaluate carefully how that money is being spent, find ways to keep the soil moist, and remove dry foliage from the ground.
