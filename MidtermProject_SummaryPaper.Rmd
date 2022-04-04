@@ -45,7 +45,7 @@ Did lower levels of soil moisture in California result in larger or more frequen
 
 
 	      
- # Chapter 2: Previous Research
+# Chapter 2: Previous Research
 
 One of the first papers we looked at was “Climate change and growth scenarios for California wildfire” which talked about how population growth may affect the the frequency and intensity of wildfires. According to the authors Westerling, Bryant, and Preisler in  human-induced climatic change and the increasing population in California are likely to impact large wildfires in the area directly. The research studied different scenarios for future population growth and wildland-urban interface relative to housing density and assessed the results for thirty years. In every scenario, there was an anticipated increased wildfire burned area which grew over time if the human-induced climatic change continues at the same intensity. <br />
 
