@@ -18,14 +18,14 @@ When you click the **Knit** button a document will be generated that includes bo
 Data Loading
 ```{r}
 library("RSQLite")
-connection <- dbConnect(drv=RSQLite::SQLite(), dbname="/Users/sumanth/Downloads/6101_Project_Data/wildfires_historic.sqlite")
+connection <- dbConnect(drv=RSQLite::SQLite(), dbname="/Users/sumanth/Downloads/Wildfire_Data/wildfires_historic.sqlite")
 tables <- dbListTables(connection)
 tables <- tables[tables != "sqlite_sequence"]
 cali_fires = dbGetQuery(conn=connection, statement=paste("SELECT * FROM 'Fires' WHERE STATE = 'CA'"))
-rainfall <- read.csv("/Users/sumanth/Downloads/6101_Project_Data/rainfall_daily.csv")
-soilmoisture <- read.csv("/Users/sumanth/Downloads/6101_Project_Data/soilmoisture_daily.csv")
-airtemp <- read.csv("/Users/sumanth/Downloads/6101_Project_Data/airtemp_daily.csv")
-fire_budget <- read.csv("/Users/sumanth/Downloads/fire_suppression.csv")
+rainfall <- read.csv("/Users/sumanth/Downloads/Wildfire_Data/rainfall_daily.csv")
+soilmoisture <- read.csv("/Users/sumanth/Downloads/Wildfire_Data/soilmoisture_daily.csv")
+airtemp <- read.csv("/Users/sumanth/Downloads/Wildfire_Data/airtemp_daily.csv")
+fire_budget <- read.csv("/Users/sumanth/Downloads/WildFire_Data/fire_suppression.csv")
 ```
 
 Data Cleaning
@@ -71,4 +71,78 @@ final_wildfire <- merge(joined3, cleaned_fires, by.x="Year", by.y="FIRE_YEAR")
 ```{r}
 nrow(final_wildfire)
 ncol(final_wildfire)
+```
+
+```{r}
+library(lessR)
+
+pie(table(final_wildfire$FIRE_SIZE_CLASS))
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+yearly_count <- final_wildfire %>% count(Year)
+colnames(yearly_count) <- c("Year", "Count")
+ggplot(yearly_count, aes(x=Year, y=Count, group=1)) + geom_line() + ggtitle("Yearly Recorded Fires")
+```
+
+```{r}
+
+ggplot(fire_budget, aes(x=Year, y=Budget, group=1)) + geom_line() + scale_y_discrete(limits=rev) + ggtitle("California Fire Suppression Budget 1979-2021")
+```
+
+```{r}
+final_wildfire$Avg_Temp <- (9 * final_wildfire$Avg_Temp / 5) + 32
+```
+
+
+```{r}
+dat <- aggregate(FIRE_SIZE ~ Year, final_wildfire, mean)
+ggplot(dat, aes(x=Year, y=FIRE_SIZE, group=1)) + geom_line()
+```
+
+Setting up different groups for the first hypothesis test. We are looking to compare different
+classes of wildfires and how different conditions may have been.
+```{r}
+classA <- final_wildfire[final_wildfire$FIRE_SIZE_CLASS == 'A',]
+classB <- final_wildfire[final_wildfire$FIRE_SIZE_CLASS == 'B',]
+classC <- final_wildfire[final_wildfire$FIRE_SIZE_CLASS == 'C',]
+classD <- final_wildfire[final_wildfire$FIRE_SIZE_CLASS == 'D',]
+classE <- final_wildfire[final_wildfire$FIRE_SIZE_CLASS == 'E',]
+classF <- final_wildfire[final_wildfire$FIRE_SIZE_CLASS == 'F',]
+classG <- final_wildfire[final_wildfire$FIRE_SIZE_CLASS == 'G',]
+```
+
+
+```{r}
+t.test(classA$Avg_Temp, classG$Avg_Temp, var.equal = TRUE)
+t.test(classA$Avg_SoilMoisture, classG$Avg_SoilMoisture, var.equal = TRUE)
+t.test(classA$Avg_Rainfall, classG$Avg_Rainfall, var.equal = TRUE)
+```
+```{r}
+code1 <- final_wildfire[final_wildfire$STAT_CAUSE_CODE == 1,]
+code2 <- final_wildfire[final_wildfire$STAT_CAUSE_CODE == 2,]
+code7 <- final_wildfire[final_wildfire$STAT_CAUSE_CODE == 7,]
+```
+Code 1: Lightning
+Code 2: Equipment Use
+Code 7: Arson
+```{r}
+t.test(code1$Avg_Temp, code2$Avg_Temp, var.equal=TRUE)
+t.test(code1$Avg_SoilMoisture, code2$Avg_SoilMoisture, var.equal=TRUE)
+t.test(code1$Avg_Rainfall, code2$Avg_Rainfall, var.equal=TRUE)
+```
+
+```{r}
+t.test(code1$Avg_Temp, code7$Avg_Temp, var.equal=TRUE)
+t.test(code1$Avg_SoilMoisture, code7$Avg_SoilMoisture, var.equal=TRUE)
+t.test(code1$Avg_Rainfall, code7$Avg_Rainfall, var.equal=TRUE)
+```
+
+```{r}
+t.test(code7$Avg_Temp, code2$Avg_Temp, var.equal=TRUE)
+t.test(code7$Avg_SoilMoisture, code2$Avg_SoilMoisture, var.equal=TRUE)
+t.test(code7$Avg_Rainfall, code2$Avg_Rainfall, var.equal=TRUE)
+
 ```
