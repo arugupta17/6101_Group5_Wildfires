@@ -33,11 +33,66 @@ Data Cleaning
 
 First, we will remove the unnecessary columns from the wildfire dataset
 ```{r}
-cleaned_fires <- subset(cali_fires, select = -c(OBJECTID, FOD_ID, FPA_ID, SOURCE_SYSTEM_TYPE, SOURCE_SYSTEM, NWCG_REPORTING_AGENCY, NWCG_REPORTING_UNIT_ID, NWCG_REPORTING_UNIT_NAME, SOURCE_REPORTING_UNIT, SOURCE_REPORTING_UNIT_NAME, LOCAL_FIRE_REPORT_ID, LOCAL_INCIDENT_ID, FIRE_CODE, ICS_209_INCIDENT_NUMBER, ICS_209_NAME, MTBS_ID, MTBS_FIRE_NAME, COMPLEX_NAME, OWNER_CODE, OWNER_DESCR, Shape, COUNTY, FIPS_CODE, FIPS_NAME, FIRE_NAME,  LATITUDE, LONGITUDE,DISCOVERY_TIME,CONT_TIME))
+cleaned_fires <- subset(cali_fires, select = -c(OBJECTID, FOD_ID, FPA_ID, SOURCE_SYSTEM_TYPE, SOURCE_SYSTEM, NWCG_REPORTING_AGENCY, NWCG_REPORTING_UNIT_ID, NWCG_REPORTING_UNIT_NAME, SOURCE_REPORTING_UNIT, SOURCE_REPORTING_UNIT_NAME, LOCAL_FIRE_REPORT_ID, LOCAL_INCIDENT_ID, FIRE_CODE, ICS_209_INCIDENT_NUMBER, ICS_209_NAME, MTBS_ID, MTBS_FIRE_NAME, COMPLEX_NAME, OWNER_CODE, OWNER_DESCR, Shape, COUNTY, FIPS_CODE, FIPS_NAME, FIRE_NAME,  DISCOVERY_TIME,CONT_TIME))
 ```
 
-Next, will adjust the Air Temperature dataset so that it includes the yearly average temperatures
+
+
+
 ```{r}
+str(cleaned_fires)
+final_fires=subset(cleaned_fires, is.na(LONGITUDE)==F)
+final_fires=subset(final_fires, is.na(LATITUDE)==F)
+str(final_fires)
+library(tidyverse)
+library(sf)
+library(mapview)
+maxl=max(final_fires$LATITUDE)
+minl=min(final_fires$LATITUDE)
+maxlong=max(final_fires$LONGITUDE)
+minlong=min(final_fires$LONGITUDE)
+final_fires$latgroup=0
+final_fires$latgroupcentral=0
+final_fires$longgroup=0
+final_fires$longgroupcentral=0
+temp=(maxl-minl)/6
+
+for (i in c(1,2,3,4,5)){
+  final_fires$latgroup[final_fires$LATITUDE>=minl+(i-1)*temp]=i
+  final_fires$latgroupcentral[final_fires$LATITUDE>=minl+(i-1)*temp]=minl+(i-1)*temp+temp*0.5
+  
+  
+}
+
+for (i in c(1,2,3,4,5)){
+  temp1=subset(final_fires,latgroup=i)
+  tempmax=max(temp1$LONGITUDE)
+  tempmin=min(temp1$LONGITUDE)
+  final_fires$longgroup[final_fires$latgroup==i & final_fires$LONGITUDE>=tempmin]=1
+  final_fires$longgroupcentral[final_fires$latgroup==i & final_fires$LONGITUDE>=tempmin]=tempmin+0.25*(tempmax-tempmin)
+  final_fires$longgroup[final_fires$latgroup==i & final_fires$LONGITUDE>=tempmin+0.5*(tempmax-tempmin)]=2
+  final_fires$longgroupcentral[final_fires$latgroup==i & final_fires$LONGITUDE>=tempmin+0.5*(tempmax-tempmin)]=tempmin+0.75*(tempmax-tempmin)
+  
+  
+  
+
+  
+  
+}
+
+
+
+
+
+
+
+
+```
+
+
+Next, we do the same to the Rainfall dataset so that it includes the yearly average rainfall
+```{r}
+
 airtemp$month <- strftime(airtemp$time, "%m")
 airtemp$year <- strftime(airtemp$time, "%Y")
 airtemp$DOY <- strftime(airtemp$time, "%j")
@@ -54,10 +109,6 @@ str(cleaned_airtemp)
 summary(cleaned_fires)
 
 str(cleaned_airtemp)
-```
-
-Next, we do the same to the Rainfall dataset so that it includes the yearly average rainfall
-```{r}
 
 rainfall$year <- strftime(rainfall$time, "%Y")
 rainfall$DOY <- strftime(airtemp$time, "%j")
@@ -93,12 +144,11 @@ joined2$year=as.integer(joined2$year)
 joined2$DOY=as.integer(joined2$DOY)
 
 
-final_wildfire <- merge(fire_budget, cleaned_fires, by.x="Year", by.y="FIRE_YEAR")
-final_wildfire$existDay = final_wildfire$CONT_DATE- final_wildfire$DISCOVERY_DATE
 
-final_wildfire=merge(final_wildfire,joined2,by.x=c('Year','DISCOVERY_DOY'),by.y=c('year','DOY'),all.x=TRUE)
+
+final_wildfire=merge(final_fires,joined2,by.x=c('FIRE_YEAR','DISCOVERY_DOY'),by.y=c('year','DOY'),all.x=TRUE)
 str(final_wildfire)
-summary(final_wildfire)
+summary(final_fires)
 ```
 
 ```{r}
@@ -118,37 +168,12 @@ table(fire_nature$month)
 fire_peoplecause=final_wildfire[final_wildfire$STAT_CAUSE_DESCR %in% c('Arson','Campfire','Children','Debris Buring','Equipment use','Firework','Powerline','Railroad','Smoking','Structure'),]
 table(fire_peoplecause$month)
 ```
-create summary by month
+
 
 
 
 ```{r}
-temp=aggregate(tair_day_livneh_vic~Year+month,data=final_wildfire,mean)
-temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=final_wildfire,mean)
 
-temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=final_wildfire,mean)
-joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
-joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
-temp3=fire_peoplecause %>% count(Year, month)
-joined3=merge(joined3,temp3,by.x=c('Year','month'),by.y=c('Year','month'))
-temp3=aggregate(FIRE_SIZE~Year+month,data=fire_peoplecause,mean)
-summary_peoplecaused=merge(joined3,temp3,by.x=c('Year','month'),by.y=c('Year','month'))
+write.csv(final_wildfire,'finalProject_wildfire_observations.csv')
 
-temp=aggregate(tair_day_livneh_vic~Year+month,data=final_wildfire,mean)
-temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=final_wildfire,mean)
-
-temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=final_wildfire,mean)
-joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
-joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
-temp3=fire_nature %>% count(Year, month)
-joined3=merge(joined3,temp3,by.x=c('Year','month'),by.y=c('Year','month'))
-temp3=aggregate(FIRE_SIZE~Year+month,data=fire_nature,mean)
-
-summary_nature=merge(joined3,temp3,by.x=c('Year','month'),by.y=c('Year','month'))
-summary_nature=merge(summary_nature,fire_budget,by.x='Year',by.y='Year')
-summary_peoplecaused=merge(summary_peoplecaused,fire_budget,by.x='Year',by.y='Year')
-
-write.csv(summary_nature,'summary_nature.csv')
-write.csv(summary_peoplecaused,'summary_peoplecaused.csv')
-write.csv(final_wildfire,'final_wildfire.csv')
 ```
