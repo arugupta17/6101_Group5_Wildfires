@@ -33,20 +33,63 @@ options(scientific=T, digits = 3)
 loadPkg("ggplot2")
 ```
 
+
+# Loading Data sets 
 ```{r }
 WildfireData <- read.csv('final_wildfire.csv')
 summary_nature=read.csv('summary_nature.csv')
 summary_peoplecaused=read.csv('summary_peoplecaused.csv')
 fire_budget  <- read.csv("fire_suppression.csv")
+
+
+colnames(summary_nature)[7]='nature_fire'
+summary_nature$people_caused_fires=summary_peoplecaused$n
+summary_nature$total=summary_nature$nature_fire+summary_peoplecaused$n
 ```
+
 
 ```{r}
 
-Avg_Temp <- WildfireData$tair_day_livneh_vic
-Avg_SoilMoisture <- WildfireData$soilmoist1_day_livneh_vic
-Avg_Rainfall <- WildfireData$rainfall_day_livneh_vic
+Avg_Temp <- summary_nature$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_nature$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_nature$rainfall_day_livneh_vic
 
 ```
+
+
+# Contigency Tables 
+
+```{r crosstable}
+totalFiretable = xtabs(total ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+
+totalFiretable
+```
+
+
+```{r logitmodel}
+logitTotal <- glm(total~Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+```
+```{r results='markup'}
+xkabledply(logitTotal, title = paste("Logistic Regression :", format(formula(logitTotal)) ))
+```
+
+
+```{r logitmodel}
+logitFireSize <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+```
+```{r results='markup'}
+xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(logitFireSize)) ))
+```
+
+
+```{r logitmodel}
+logitMonth <- glm(Month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+```
+```{r results='markup'}
+xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(logitMonth)) ))
+```
+
+
 
 
 
