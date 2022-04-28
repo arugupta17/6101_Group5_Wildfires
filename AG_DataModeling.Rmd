@@ -71,6 +71,7 @@ logitTotal <- glm(total~Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summa
 ```
 ```{r results='markup'}
 xkabledply(logitTotal, title = paste("Logistic Regression :", format(formula(logitTotal)) ))
+predict(logitTotal)
 ```
 
 
