@@ -18,14 +18,13 @@ library(ggplot2)
 ggplot(cleaned_airtemp,aes(sample=Avg_Temp))+ 
 geom_qq()+ 
 geom_qq_line()+
-ggtitle("Airtemp_norm_distribution")
+ggtitle("QQ-Plot of average air temperature")
 #
 ggplot(cleaned_airtemp,aes(sample=Avg_Temp, col= Year ))+
 geom_qq()+
 geom_qq_line()+
 theme_minimal()+
-ggtitle("Airtemp_norm_distribution_Year")
-
+ggtitle("QQ-Plot of average air temperature color by year")
 ```
 
 #qqplots of fire_size.
@@ -33,14 +32,13 @@ ggtitle("Airtemp_norm_distribution_Year")
 ggplot(cleaned_fires,aes(sample=FIRE_SIZE))+ 
 geom_qq()+ 
 geom_qq_line()+
-ggtitle("FIRE_SIZE_norm_distribution")
+ggtitle("QQ-Plot of fire size")
 #
 ggplot(cleaned_fires,aes(sample=FIRE_SIZE,col= STAT_CAUSE_DESCR))+
 geom_qq()+
 geom_qq_line()+
 theme_minimal()+
-ggtitle("FIRE_SIZE_norm_distribution_CAUSE")
-
+ggtitle("QQ-Plot of fire size color by cause")
 ```
 
 #qqplots of avg_rainfall.
@@ -48,13 +46,13 @@ ggtitle("FIRE_SIZE_norm_distribution_CAUSE")
 ggplot(cleaned_rainfall,aes(sample=Avg_Rainfall))+ 
 geom_qq()+ 
 geom_qq_line()+
-ggtitle("Avg_Rainfall_norm_distribution")
+ggtitle("QQ-Plot of average rainfall")
 #
 ggplot(cleaned_rainfall,aes(sample=Avg_Rainfall,col= Year))+
 geom_qq()+
 geom_qq_line()+
 theme_minimal()+
-ggtitle("Avg_Rainfall_norm_distribution_Year")
+ggtitle("QQ-Plot of average rainfall color by year")
 str(cleaned_rainfall)
 ```
 
@@ -64,13 +62,13 @@ library(ggplot2)
 ggplot(cleaned_soilmoisture,aes(sample=Avg_SoilMoisture))+ 
 geom_qq()+ 
 geom_qq_line()+
-ggtitle("Avg_SoilMoisture_norm_distribution")
+ggtitle("QQ-Plot of average soil moisture")
 #
 ggplot(cleaned_soilmoisture,aes(sample=Avg_SoilMoisture,col= Year))+
 geom_qq()+
 geom_qq_line()+
 theme_minimal()+
-ggtitle("Avg_SoilMoisture_norm_distribution_Year")
+ggtitle("QQ-Plot of average soil moisture color by year")
 
 str(cleaned_airtemp)
 str(cleaned_fires)
