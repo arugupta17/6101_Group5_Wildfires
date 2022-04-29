@@ -30,6 +30,16 @@ options(scientific=T, digits = 3)
 ```
 
 ```{r}
+
+# Installing Packages
+install.packages("e1071")
+install.packages("caTools")
+install.packages("class")
+  
+# Loading package
+library(e1071)
+library(caTools)
+library(class)
 loadPkg("ggplot2")
 ```
 
@@ -95,7 +105,7 @@ logitMonth <- glm(month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall
 xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(logitMonth)) ))
 ```
 
-#basic visualization 
+#Basic Visualization 
 
 ```{r}
 loadPkg("FNN")
@@ -122,17 +132,6 @@ for (xx in 1:(length(summary_nature)-2) ) {
 ```{r}
 scaledWildfires <- as.data.frame(scale(summary_nature[1:7], center = TRUE, scale = TRUE))
 set.seed(321)
-
-
-# Installing Packages
-install.packages("e1071")
-install.packages("caTools")
-install.packages("class")
-  
-# Loading package
-library(e1071)
-library(caTools)
-library(class)
 
 
 # Splitting data into train and test data
