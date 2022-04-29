@@ -58,7 +58,7 @@ str(cleaned_rainfall)
 
 #qqplots of soilmoisture.
 ```{r, results='markup'}
-library(ggplot2)
+library(ggplot2=)
 ggplot(cleaned_soilmoisture,aes(sample=Avg_SoilMoisture))+ 
 geom_qq()+ 
 geom_qq_line()+
