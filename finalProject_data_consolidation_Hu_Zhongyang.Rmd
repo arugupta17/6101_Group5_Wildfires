@@ -190,16 +190,99 @@ joined3=merge(joined3,cleaned_soilmoisture,by.x=c('year','DOY'),by.y=c('year','D
 joined3$DOY=as.numeric(joined3$DOY)-1
 
 day_summary=merge(temp3,joined3,by.x=c('FIRE_YEAR','DISCOVERY_DOY'),by.y=c('year','DOY'),all.x=T)
-str(day_summary) 
+str(day_summary)
+day_summary$latgroup=as.factor(day_summary$latgroup)
+day_summary$longgroup=as.factor(day_summary$longgroup)
 library(tidyr)
 day_summary=drop_na(day_summary)
 library(corrplot)
-corresult=cor(day_summary[c(3,4,7,8,10,11)],method='spearman')
+
 day_summary$latgroup=as.factor(day_summary$latgroup)
 day_summary$longgroup=as.factor(day_summary$longgroup)
-corrplot(corresult,method='number',type = 'lower', diag = TRUE)
-model1=lm(n~tair_day_livneh_vic+latgroup+longgroup,data=day_summary)
+
+model1=lm(log(n)~tair_day_livneh_vic+latgroup+longgroup,data=day_summary)
 summary(model1)
-model2=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup,data=day_summary)
+model2=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup
+          ,data=day_summary)
 summary(model2)
+model3=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup
+          +soilmoist1_day_livneh_vic*latgroup+soilmoist1_day_livneh_vic*longgroup,data=day_summary)
+summary(model3)
+
+```
+
+```{r}
+
+temp5=subset(joined3,year>=1992 & year<=2013)
+temp5$latgroup=1
+temp5$longgroup=1
+day_summary2=temp5
+temp5$longgroup=2
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=2
+temp5$longgroup=1
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=2
+temp5$longgroup=2
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=3
+temp5$longgroup=1
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=3
+temp5$longgroup=2
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=4
+temp5$longgroup=1
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=4
+temp5$longgroup=2
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=5
+temp5$longgroup=1
+day_summary2=rbind(day_summary2,temp5)
+temp5$latgroup=5
+temp5$longgroup=2
+day_summary2=rbind(day_summary2,temp5)
+day_summary2=merge(day_summary2,temp3,by.x=c('year','DOY','latgroup','longgroup'),by.y=c('FIRE_YEAR','DISCOVERY_DOY','latgroup','longgroup'),all.x=T)
+
+```
+
+
+```{r}
+
+day_summary2$n[is.na(day_summary2$n)==T]=0
+day_summary2$fire=1
+day_summary2$fire[day_summary2$n==0]=0
+day_summary2$fire=as.factor(day_summary2$fire)
+day_summary2$latgroup=as.factor(day_summary2$latgroup)
+day_summary2$longgroup=as.factor(day_summary2$longgroup)
+
+str(day_summary2)
+
+
+```
+
+
+
+
+
+```{r}
+
+model4=glm(fire~tair_day_livneh_vic+latgroup+longgroup,data=day_summary2,family=binomial())
+summary(model4)
+library('pROC')
+prob=predict(model4, type = "response" )
+day_summary2$prob=prob
+h = roc(n~prob, data=day_summary2)
+auc(h) 
+model5=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup
+          +soilmoist1_day_livneh_vic*latgroup+soilmoist1_day_livneh_vic*longgroup,data=day_summary2,family=binomial())
+summary(model5)
+library('pROC')
+prob=predict(model5, type = "response" )
+day_summary2$prob=prob
+h = roc(n~prob, data=day_summary2)
+auc(h) 
+plot(h)
+
 ```
