@@ -1,0 +1,238 @@
+---
+title: "WildFire_Project Analysis"
+author: "Aru Gupta"
+# date: "today"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+Data Loading
+```{r}
+library("RSQLite")
+connection <- dbConnect(drv=RSQLite::SQLite(), dbname="/Users/Arundhati/Documents/6101_Group5_Wildfires/wildfires_historic.sqlite")
+tables <- dbListTables(connection)
+tables <- tables[tables != "sqlite_sequence"]
+#cali_fires = dbGetQuery(conn=connection, statement=paste("SELECT * FROM 'Fires' WHERE STATE = 'CA'"))
+rainfall <- read.csv("/Users/Arundhati/Documents/6101_Group5_Wildfires/rainfall_daily.csv")
+soilmoisture <- read.csv("/Users/Arundhati/Documents/6101_Group5_Wildfires/soilmoisture_daily.csv")
+airtemp <- read.csv("/Users/Arundhati/Documents/6101_Group5_Wildfires/airtemp_daily.csv")
+fire_budget <- read.csv("/Users/Arundhati/Documents/6101_Group5_Wildfires/fire_suppression.csv")
+```
+
+Data Cleaning
+
+First, we will remove the unnecessary columns from the wildfire dataset
+```{r}
+cleaned_fires <- subset(cali_fires, select = -c(OBJECTID, FOD_ID, FPA_ID, SOURCE_SYSTEM_TYPE, SOURCE_SYSTEM, NWCG_REPORTING_AGENCY, NWCG_REPORTING_UNIT_ID, NWCG_REPORTING_UNIT_NAME, SOURCE_REPORTING_UNIT, SOURCE_REPORTING_UNIT_NAME, LOCAL_FIRE_REPORT_ID, LOCAL_INCIDENT_ID, FIRE_CODE, ICS_209_INCIDENT_NUMBER, ICS_209_NAME, MTBS_ID, MTBS_FIRE_NAME, COMPLEX_NAME, OWNER_CODE, OWNER_DESCR, Shape, COUNTY, FIPS_CODE, FIPS_NAME, FIRE_NAME, DISCOVERY_DATE, DISCOVERY_DOY, DISCOVERY_TIME, CONT_DATE, CONT_DOY, CONT_TIME, LATITUDE, LONGITUDE))
+```
+
+Next, will adjust the Air Temperature dataset so that it includes the yearly average temperatures
+```{r}
+airtemp$year <- strftime(airtemp$time, "%Y")
+library(dplyr)
+cleaned_airtemp <- subset(airtemp, select = -c(time))
+cleaned_airtemp <- aggregate(tair_day_livneh_vic~ year, cleaned_airtemp, mean)
+colnames(cleaned_airtemp) <- c("Year", "Avg_Temp")
+```
+
+Next, we do the same to the Rainfall dataset so that it includes the yearly average rainfall
+```{r}
+rainfall$year <- strftime(rainfall$time, "%Y")
+cleaned_rainfall <- subset(rainfall, select = -c(time))
+cleaned_rainfall <- aggregate(rainfall_day_livneh_vic ~ year, cleaned_rainfall, mean)
+colnames(cleaned_rainfall) <- c("Year", "Avg_Rainfall")
+```
+
+And then we do the same to the Soil Moisture dataset so that it includes the yearly average soil moisture
+```{r}
+soilmoisture$year <- strftime(soilmoisture$time, "%Y")
+cleaned_soilmoisture <- subset(soilmoisture, select = -c(time))
+cleaned_soilmoisture <- aggregate(soilmoist1_day_livneh_vic ~ year, cleaned_soilmoisture, mean)
+colnames(cleaned_soilmoisture) <- c("Year", "Avg_SoilMoisture")
+```
+
+Finally, we combine our data into one comprehensive dataset.
+```{r}
+joined1 <- merge(cleaned_airtemp, cleaned_soilmoisture, by.x="Year", by.y="Year")
+joined2 <- merge(joined1, cleaned_rainfall, by.x="Year", by.y="Year")
+joined3 <- merge(joined2, fire_budget, by.x="Year", by.y="Year")
+final_wildfire <- merge(joined3, cleaned_fires, by.x="Year", by.y="FIRE_YEAR")
+```
+
+```{r}
+nrow(final_wildfire)
+ncol(final_wildfire)
+View(final_wildfire)
+```
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+```{r }
+final_fire=read.csv('final_wildfire.csv')
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+
+
+View('summary_nature.csv')
+```
+
+```{r init, include=F}}
+library('ezids')
+```
+
+##Five Point Summary 
+```{r, results="asis"}
+xkablesummary(final_wildfire)
+```
+
+## HISTOGRAMS
+
+Need units 
+
+```{r, results="markup"}
+
+
+library(ggplot2)
+
+#Average Temperature
+TempHist <- ggplot(final_wildfire, aes(Avg_Temp))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="light blue 2") +
+  labs(x="Avg. Temp (C)", y="Frequency", title="HISTOGRAM: Average Temprature") 
+
+
+#Average Soil Moisture
+SoilHist <- ggplot(final_wildfire, aes(Avg_SoilMoisture))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="orange red 2") +
+  labs(x="Avg. Soil Moisture", y="Frequency", title="HISTOGRAM: Average Soil Moisture") 
+
+#Average Rainfall
+RainHist <- ggplot(final_wildfire, aes(Avg_Rainfall))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="green 3") +
+  labs(x="Avg. Rainfall", y="Frequency", title="HISTOGRAM: Average Rainfall") 
+
+#Wildfire Count by Year
+CountHist <- ggplot(final_wildfire, aes(Year))+ 
+  geom_histogram(binwidth = 0.10, bins = 100, col="black", fill="yellow", stat="count") +
+  labs(x="Years", y="Frequency of Wildfires", title="Wildfires count by year", )
+
+grid.arrange(TempHist, SoilHist, RainHist,CountHist, ncol=2, nrow=2)
+```
+
+
+##Boxplots
+```{r, results="markup"}
+
+#Average Temperature
+loadPkg("ggplot2")
+TempBox <- ggplot(final_wildfire, aes(y= Avg_Temp)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="light blue 2", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Temperature boxplot using `ggplot`")
+
+#Average Soil Moisture
+SoilBox <- ggplot(final_wildfire, aes(y= Avg_SoilMoisture)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="orange red 2", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Soil Moisture boxplot using `ggplot`")
+
+#Average Rainfall
+RainBox <- ggplot(final_wildfire, aes(y= Avg_Rainfall)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="green 3", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Rainfall boxplot using `ggplot`")
+
+#Fire Size
+ggplot(final_wildfire, aes(y= FIRE_SIZE)) + 
+  geom_boxplot() + 
+  geom_boxplot( colour="black", fill="green 3", outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  labs(title="Average Rainfall boxplot using `ggplot`")
+
+
+
+grid.arrange(TempBox, SoilBox, RainBox, ncol=3)
+
+```
+
+
+##Bar Graphs
+```{r, results="markup"}
+
+#Fire Size
+FireBar <- ggplot(data = final_wildfire, aes(x = FIRE_SIZE_CLASS)) +
+  geom_bar(col="black", fill="orange")+
+  labs(x="Fire Size Class", y="Frequency", title="Frequency of Wildfires by Size Classes") 
+ggsave("FireBar.jpg", plot = FireBar)
+
+#Years
+YearsBar <- ggplot(data = final_wildfire, aes(x = Year)) +
+  geom_bar(col="black", fill="yellow")+
+  labs(x="Years", y="Frequency", title="Frequency of Wildfires by Year")
+ggsave("YearsBar.jpg", plot = YearsBar)
+
+#Budget
+BudgetBar <- ggplot(data = final_wildfire, aes(x = Budget)) +
+  geom_bar(col="black", fill="Pink 2")+
+  labs(x="Budget", y="Frequency", title="Frequency of Wildfires by Budget")
+ggsave("BudgetBar.jpg", plot = BudgetBar)
+
+
+barcharts <- grid.arrange(FireBar, YearsBar, nrow=2)
+ggsave("barcharts.jpg", plot = barcharts)
+
+```
+
+
+##Scatter Plots
+```{r Q11, echo=F}
+
+ggplot(data=final_wildfire)+
+  geom_point(mapping = aes(x=Year, y=Budget))+
+  ggtitle("Scatter plot of Budget(y,Dollars) vs Year(x)")+
+  geom_bar(stat = "identity", col = "pink", fill = "blue") + 
+  labs(x='Years', y='Budget', title = charttitle) + theme_bw(16, "serif", ) +
+  theme(plot.title = element_text(size = rel(1.2), vjust = 1.5))
+
+
+ggplot(final_wildfire, aes(x = Year, y = Budget)) + 
+  geom_bar(stat = "identity", col = "pink", fill = "blue") + 
+  scale_y_continuous( expand = c(0.01, 0)) +
+  labs(x='Years', y='Budget', title = charttitle) + theme_bw(16, "serif", ) +
+  theme(plot.title = element_text(size = rel(1.2), vjust = 1.5))
+
+
+```
+
+
+##Pie Charts
+```{r, results="markup"}
+lbls <- c("A", "B", "C", "D", "E", "F", "G", "E")
+pie((table(final_wildfire$FIRE_SIZE_CLASS)), labels = lbls, col=rainbow(length(lbls)), main="Pie Chart of Fire Size Class")
+
+```
+
+```{r, results="markup"}
+lbls <- c("Lightning", "Eqipment Use", "Smoking", "Campfire", "Debris Burning", "Railroad", "Arson", "Children", "Misc." )
+pie((table(final_wildfire$STAT_CAUSE_DESCR)), labels = lbls, col=rainbow(length(lbls)), main="Pie Chart of Wildfire Cause")
+
+```

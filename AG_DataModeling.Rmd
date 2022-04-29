@@ -1,0 +1,107 @@
+---
+title: "Final Data Modeling"
+author: "Aru Gupta"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: true
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r include=FALSE}
+# The package "ezids" (EZ Intro to Data Science) includes a lot of the helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+library(ezids)
+ 
+# some of common options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# knitr::opts_chunk$set(warning = F, results = "markup", message = F)
+knitr::opts_chunk$set(warning = F, results = "hide", message = F)
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+# ‘scipen’: integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation.  Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than ‘scipen’ digits wider.
+# use scipen=999 to prevent scientific notation at all times
+```
+
+```{r base_lib}
+loadPkg("ggplot2")
+```
+
+
+# Loading Data sets 
+```{r }
+WildfireData <- read.csv('final_wildfire.csv')
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+fire_budget  <- read.csv("fire_suppression.csv")
+
+
+colnames(summary_nature)[7]='nature_fire'
+summary_nature$people_caused_fires=summary_peoplecaused$n
+summary_nature$total=summary_nature$nature_fire+summary_peoplecaused$n
+```
+
+
+```{r}
+
+Avg_Temp <- summary_nature$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_nature$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_nature$rainfall_day_livneh_vic
+
+```
+
+
+# Contigency Tables 
+
+```{r crosstable}
+totalFiretable = xtabs(total ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+
+totalFiretable
+```
+
+
+```{r logitmodel}
+logitTotal <- glm(total~Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+```
+```{r results='markup'}
+xkabledply(logitTotal, title = paste("Logistic Regression :", format(formula(logitTotal)) ))
+```
+
+
+```{r logitmodel}
+logitFireSize <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+```
+```{r results='markup'}
+xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(logitFireSize)) ))
+```
+
+
+```{r logitmodel}
+logitMonth <- glm(Month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+```
+```{r results='markup'}
+xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(logitMonth)) ))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
