@@ -145,14 +145,14 @@ test_wildfires <- subset(summary_nature, split == "FALSE")
 train_scale <- scale(train_wildfires[, 1:4])
 test_scale <- scale(test_wildfires[, 1:4])
   
-# Fitting KNN Model to training dataset
+# Fitting KNN Model to training data set
 classifier_knn <- knn(train = train_scale,
                       test = test_scale,
                       cl = train_wildfires$FIRE_SIZE,
                       k = 1)
 classifier_knn
 
-# Confusiin Matrix
+# Confusion Matrix
 cm <- table(test_wildfires$FIRE_SIZE, classifier_knn)
 cm
   
