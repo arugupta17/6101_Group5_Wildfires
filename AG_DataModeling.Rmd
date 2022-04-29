@@ -29,7 +29,7 @@ options(scientific=T, digits = 3)
 # use scipen=999 to prevent scientific notation at all times
 ```
 
-```{r base_lib}
+```{r}
 loadPkg("ggplot2")
 ```
 
@@ -66,17 +66,21 @@ totalFiretable
 ```
 
 
+# Logistic Regression
+
 ```{r logitmodel}
-logitTotal <- glm(total~Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+logitTotal <- glm(log(total)~Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitTotal)
 ```
 ```{r results='markup'}
 xkabledply(logitTotal, title = paste("Logistic Regression :", format(formula(logitTotal)) ))
-predict(logitTotal)
+#predict(logitTotal)
 ```
 
 
 ```{r logitmodel}
 logitFireSize <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitFireSize)
 ```
 ```{r results='markup'}
 xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(logitFireSize)) ))
@@ -84,13 +88,16 @@ xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(
 
 
 ```{r logitmodel}
-logitMonth <- glm(Month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+logitMonth <- glm(month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitMonth)
 ```
 ```{r results='markup'}
 xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(logitMonth)) ))
 ```
 
 
+
+#KNN
 
 
 
