@@ -177,3 +177,29 @@ table(fire_peoplecause$month)
 write.csv(final_wildfire,'finalProject_wildfire_observations.csv')
 
 ```
+
+
+```{r}
+
+temp3=final_wildfire %>% count(FIRE_YEAR, DISCOVERY_DOY,latgroup,longgroup,latgroupcentral,longgroupcentral)
+
+
+joined3=merge(cleaned_airtemp,cleaned_rainfall,by.x=c('year','DOY'),by.y=c('year','DOY'))
+joined3=merge(joined3,cleaned_soilmoisture,by.x=c('year','DOY'),by.y=c('year','DOY'))
+
+joined3$DOY=as.numeric(joined3$DOY)-1
+
+day_summary=merge(temp3,joined3,by.x=c('FIRE_YEAR','DISCOVERY_DOY'),by.y=c('year','DOY'),all.x=T)
+str(day_summary) 
+library(tidyr)
+day_summary=drop_na(day_summary)
+library(corrplot)
+corresult=cor(day_summary[c(3,4,7,8,10,11)],method='spearman')
+day_summary$latgroup=as.factor(day_summary$latgroup)
+day_summary$longgroup=as.factor(day_summary$longgroup)
+corrplot(corresult,method='number',type = 'lower', diag = TRUE)
+model1=lm(n~tair_day_livneh_vic+latgroup+longgroup,data=day_summary)
+summary(model1)
+model2=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup,data=day_summary)
+summary(model2)
+```
