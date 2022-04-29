@@ -99,7 +99,16 @@ xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(log
 
 #KNN
 
+```{r}
+scaledWildfires <- as.data.frame(scale(summary_nature[1:-1], center = TRUE, scale = TRUE))
 
+
+
+
+
+
+
+```
 
 
 
