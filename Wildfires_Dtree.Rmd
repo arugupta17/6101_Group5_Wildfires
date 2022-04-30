@@ -1,0 +1,27 @@
+---
+title: "DTree"
+author: "Adarsh Kotla"
+date: "4/29/2022"
+output: html_document
+---
+
+## R Markdown
+```{r pressure, echo=FALSE}
+create_train_test(df, size = 0.8, train = TRUE)
+
+create_train_test <- function(data, size = 0.8, train = TRUE) {
+    n_row = nrow(data)
+    total_row = size * n_row
+    train_sample < - 1: total_row
+    if (train == TRUE) {
+        return (data[train_sample, ])
+    } else {
+        return (data[-train_sample, ])
+    }
+}
+```
+
+```{r pressure, echo=FALSE}
+
+
+```
