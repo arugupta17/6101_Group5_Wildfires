@@ -1,0 +1,77 @@
+---
+title: "QQP"
+author: "Adarsh Kotla"
+date: "3/24/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## R Markdown
+```{r, results='markup'}
+library(ggplot2)
+```
+#qqplots of Avg_Temp.
+```{r, results='markup'}
+library(ggplot2)
+ggplot(cleaned_airtemp,aes(sample=Avg_Temp))+ 
+geom_qq()+ 
+geom_qq_line()+
+ggtitle("QQ-Plot of average air temperature")
+#
+ggplot(cleaned_airtemp,aes(sample=Avg_Temp, col= Year ))+
+geom_qq()+
+geom_qq_line()+
+theme_minimal()+
+ggtitle("QQ-Plot of average air temperature color by year")
+```
+
+#qqplots of fire_size.
+```{r, results='markup'}
+ggplot(cleaned_fires,aes(sample=FIRE_SIZE))+ 
+geom_qq()+ 
+geom_qq_line()+
+ggtitle("QQ-Plot of fire size")
+#
+ggplot(cleaned_fires,aes(sample=FIRE_SIZE,col= STAT_CAUSE_DESCR))+
+geom_qq()+
+geom_qq_line()+
+theme_minimal()+
+ggtitle("QQ-Plot of fire size color by cause")
+```
+
+#qqplots of avg_rainfall.
+```{r, results='markup'}
+ggplot(cleaned_rainfall,aes(sample=Avg_Rainfall))+ 
+geom_qq()+ 
+geom_qq_line()+
+ggtitle("QQ-Plot of average rainfall")
+#
+ggplot(cleaned_rainfall,aes(sample=Avg_Rainfall,col= Year))+
+geom_qq()+
+geom_qq_line()+
+theme_minimal()+
+ggtitle("QQ-Plot of average rainfall color by year")
+str(cleaned_rainfall)
+```
+
+#qqplots of soilmoisture.
+```{r, results='markup'}
+library(ggplot2=)
+ggplot(cleaned_soilmoisture,aes(sample=Avg_SoilMoisture))+ 
+geom_qq()+ 
+geom_qq_line()+
+ggtitle("QQ-Plot of average soil moisture")
+#
+ggplot(cleaned_soilmoisture,aes(sample=Avg_SoilMoisture,col= Year))+
+geom_qq()+
+geom_qq_line()+
+theme_minimal()+
+ggtitle("QQ-Plot of average soil moisture color by year")
+
+str(cleaned_airtemp)
+str(cleaned_fires)
+str(cleaned_rainfall)
+str(cleaned_soilmoisture)
+```
