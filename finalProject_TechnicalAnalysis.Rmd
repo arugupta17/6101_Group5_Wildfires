@@ -209,6 +209,7 @@ ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
 ```{r }
 summary_nature=read.csv('summary_nature.csv')
 summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+
 ```
 
 ```{r}
@@ -223,33 +224,13 @@ Avg_SoilMoisture <- summary_peoplecaused$soilmoist1_day_livneh_vic
 Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
 ```
 
-
-
-# Basic EDA
-
-```{r}
-str(data_wildfire)
-
-p <- ggplot(data_wildfire, aes(x=Budget, y=FIRE_SIZE_CLASS)) + 
-  geom_violin() + 
-  coord_flip() + 
-  stat_summary(fun.y=mean, geom="point", shape=23, size=2, color = "black")+
-  stat_summary(fun.y=median, geom="point", size=2, color="red")+
-  scale_fill_brewer(palette="Dark2")+
-  theme(legend.position="bottom")
-  
-p
-
-```
-
-
 # Logistic Regression
 
 ## LogTotal/n ~ nature variables
 
 ```{r logitmodel}
 ## LogTotal ~ nature variables      - NATURE CAUSED (N)
-logitTotalN <- glm(log(total)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+logitTotalN <- glm(n~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
 summary(logitTotal)
 ```
 ```{r results='markup'}
@@ -274,7 +255,7 @@ xkabledply(logitnP, title = paste("Logistic Regression :", format(formula(logitn
 
 ## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
 logitFireSizeN <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-#summary(logitFireSize)
+summary(logitFireSizeN)
 ```
 ```{r results='markup'}
 xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(logitFireSize)) ))
@@ -283,7 +264,7 @@ xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(
 
 ## FIRE_SIZE ~ nature variables       - PEOPLE CAUSED (P)
 logitFireSizeP <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
-#summary(logitFireSize)
+summary(logitFireSizeP)
 ```
 ```{r results='markup'}
 xkabledply(logitFireSizeP, title = paste("Logistic Regression :", format(formula(logitFireSizeP)) ))
@@ -295,7 +276,7 @@ xkabledply(logitFireSizeP, title = paste("Logistic Regression :", format(formula
 ```{r logitmodel}
 ## Month ~ FIRE_SIZE + nature variables      - NATURE CAUSED (N)
 logitMonthN <- glm(month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-#summary(logitMonth)
+summary(logitMonthN)
 ```
 ```{r results='markup'}
 xkabledply(logitMonthN, title = paste("Logistic Regression :", format(formula(logitMonthN)) ))
@@ -303,7 +284,7 @@ xkabledply(logitMonthN, title = paste("Logistic Regression :", format(formula(lo
 ```{r logitmodel}
 ## Month ~ FIRE_SIZE + nature variables      - PEOPLE CAUSED (P)
 logitMonthP <- glm(month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
-#summary(logitMonth)
+summary(logitMonthP)
 ```
 ```{r results='markup'}
 xkabledply(logitMonthP, title = paste("Logistic Regression :", format(formula(logitMonthP)) ))
