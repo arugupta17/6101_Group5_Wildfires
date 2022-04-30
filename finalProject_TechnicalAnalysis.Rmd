@@ -14,7 +14,14 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
-summary(cars)
+library(foreign)
+library(nnet)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(caret)
+library(yardstick)
+library(ggplot2)
 ```
 
 ## Large fire predictor
@@ -122,6 +129,77 @@ summary(model_avgsize)
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 summary(model_totalarea)
 
+```
+
+```{r}
+data_wildfire$STAT_CAUSE_CODE <- as.factor(data_wildfire$STAT_CAUSE_CODE)
+data_wildfire$FIRE_SIZE_CLASS <- as.factor(data_wildfire$FIRE_SIZE_CLASS)
+
+split <- createDataPartition(data_wildfire$FIRE_SIZE_CLASS, p = .70, list = FALSE)
+train <- data_wildfire[split,]
+test <- data_wildfire[-split,]
+```
+
+```{r}
+model1 <- multinom(FIRE_SIZE_CLASS ~ tair_day_livneh_vic + 
+                     soilmoist1_day_livneh_vic + 
+                     rainfall_day_livneh_vic, data = data_wildfire)
+summary(model1)
+```
 
 
+```{r}
+train$predictions <- predict(model1, newdata = train, "class")
+tab <- table(train$FIRE_SIZE_CLASS, train$predictions)
+round((sum(diag(tab))/sum(tab))*100,2)
+
+cm <- confusionMatrix(train$predictions, train$FIRE_SIZE_CLASS)
+
+cmdf <- as.data.frame(cm$table)
+cmdf$Prediction <- factor(cmdf$Prediction, levels=rev(levels(cmdf$Prediction)))
+
+ggplot(cmdf, aes(Prediction,Reference, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size") +
+        scale_x_discrete(labels=c("A","B","C","D", "E",
+                                  "F","G")) +
+        scale_y_discrete(labels=c("A","B","C","D", "E",
+                                  "F","G"))
+```
+
+```{r}
+model2 <- multinom(STAT_CAUSE_CODE ~ month + tair_day_livneh_vic + 
+                     soilmoist1_day_livneh_vic + 
+                     rainfall_day_livneh_vic, data = data_wildfire)
+summary(model1)
+
+```
+
+
+```{r}
+# Predicting the values for train dataset
+train$predictions <- as.factor(predict(model2, newdata = train, "class"))
+
+# Building classification table
+tab <- table(train$STAT_CAUSE_CODE, train$predictions)
+
+# Calculating accuracy - sum of diagonal elements divided by total obs
+round((sum(diag(tab))/sum(tab))*100,2)
+
+cm2 <- confusionMatrix(train$predictions, train$STAT_CAUSE_CODE)
+
+cm2df <- as.data.frame(cm2$table)
+cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
+
+ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes") +
+        scale_x_discrete(labels=c("Lightning","Equipment","Smoking","Campfire", "Burning",
+                                  "Railroad","Arson", "Children", "Misc", "Fireworks",
+                                  "Powerline", "Structure", "N/A")) +
+        scale_y_discrete(labels=c("Lightning","Equipment","Smoking","Campfire", "Burning",
+                                  "Railroad","Arson", "Children", "Misc", "Fireworks",
+                                  "Powerline", "Structure", "N/A"))
 ```
