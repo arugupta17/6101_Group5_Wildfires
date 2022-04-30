@@ -7,6 +7,20 @@ output: html_document
 
 ## R Markdown
 ```{r pressure, echo=FALSE}
+install.packages("rpart.plot")
+```
+
+```{r pressure, echo=FALSE}
+library(rpart)
+library(rpart.plot)
+```
+
+```{r pressure, echo=FALSE}
+myvars <- c("v1", "v2", "v3")
+newdata <- mydata[myvars]
+```
+
+```{r pressure, echo=FALSE}
 create_train_test(df, size = 0.8, train = TRUE)
 
 create_train_test <- function(data, size = 0.8, train = TRUE) {
@@ -22,6 +36,5 @@ create_train_test <- function(data, size = 0.8, train = TRUE) {
 ```
 
 ```{r pressure, echo=FALSE}
-
 
 ```
