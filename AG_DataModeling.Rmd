@@ -109,8 +109,13 @@ xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(log
 
 ```{r}
 loadPkg("FNN")
-#For this example we are going to use the IRIS dataset in R
+#For this example we are going to use the IRIS data set in R
 str(summary_nature)
+#Budget <- as.integer(summary_nature$Budget)
+summary_nature = subset(summary_nature, select = -c(Budget))
+
+str(summary_nature)
+
 loadPkg('ggplot2')
 ```
 
