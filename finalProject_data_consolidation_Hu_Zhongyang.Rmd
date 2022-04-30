@@ -181,7 +181,7 @@ write.csv(final_wildfire,'finalProject_wildfire_observations.csv')
 
 ```{r}
 
-temp3=final_wildfire %>% count(FIRE_YEAR, DISCOVERY_DOY,latgroup,longgroup,latgroupcentral,longgroupcentral)
+temp3=final_wildfire %>% count(FIRE_YEAR, DISCOVERY_DOY)
 
 
 joined3=merge(cleaned_airtemp,cleaned_rainfall,by.x=c('year','DOY'),by.y=c('year','DOY'))
@@ -191,22 +191,17 @@ joined3$DOY=as.numeric(joined3$DOY)-1
 
 day_summary=merge(temp3,joined3,by.x=c('FIRE_YEAR','DISCOVERY_DOY'),by.y=c('year','DOY'),all.x=T)
 str(day_summary)
-day_summary$latgroup=as.factor(day_summary$latgroup)
-day_summary$longgroup=as.factor(day_summary$longgroup)
+
 library(tidyr)
 day_summary=drop_na(day_summary)
 library(corrplot)
 
-day_summary$latgroup=as.factor(day_summary$latgroup)
-day_summary$longgroup=as.factor(day_summary$longgroup)
 
-model1=lm(log(n)~tair_day_livneh_vic+latgroup+longgroup,data=day_summary)
+
+model1=lm(log(n)~tair_day_livneh_vic,data=day_summary)
 summary(model1)
-model2=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup
-          ,data=day_summary)
-summary(model2)
-model3=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup
-          +soilmoist1_day_livneh_vic*latgroup+soilmoist1_day_livneh_vic*longgroup,data=day_summary)
+
+model3=lm(log(n)~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=day_summary)
 summary(model3)
 
 ```
@@ -249,40 +244,24 @@ day_summary2=merge(day_summary2,temp3,by.x=c('year','DOY','latgroup','longgroup'
 
 
 ```{r}
-
-day_summary2$n[is.na(day_summary2$n)==T]=0
-day_summary2$fire=1
-day_summary2$fire[day_summary2$n==0]=0
-day_summary2$fire=as.factor(day_summary2$fire)
-day_summary2$latgroup=as.factor(day_summary2$latgroup)
-day_summary2$longgroup=as.factor(day_summary2$longgroup)
-
-str(day_summary2)
+temp6=aggregate(FIRE_SIZE~FIRE_YEAR+DISCOVERY_DOY,data=final_wildfire,sum)
 
 
-```
+joined3=merge(cleaned_airtemp,cleaned_rainfall,by.x=c('year','DOY'),by.y=c('year','DOY'))
+joined3=merge(joined3,cleaned_soilmoisture,by.x=c('year','DOY'),by.y=c('year','DOY'))
+
+joined3$DOY=as.numeric(joined3$DOY)
+
+temp6=merge(temp6,joined3,by.x=c('FIRE_YEAR','DISCOVERY_DOY'),by.y=c('year','DOY'),all.x=T)
+str(temp6)
 
 
 
-
-
-```{r}
-
-model4=glm(fire~tair_day_livneh_vic+latgroup+longgroup,data=day_summary2,family=binomial())
-summary(model4)
-library('pROC')
-prob=predict(model4, type = "response" )
-day_summary2$prob=prob
-h = roc(n~prob, data=day_summary2)
-auc(h) 
-model5=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic+latgroup+longgroup+tair_day_livneh_vic*latgroup+tair_day_livneh_vic*longgroup
-          +soilmoist1_day_livneh_vic*latgroup+soilmoist1_day_livneh_vic*longgroup,data=day_summary2,family=binomial())
-summary(model5)
-library('pROC')
-prob=predict(model5, type = "response" )
-day_summary2$prob=prob
-h = roc(n~prob, data=day_summary2)
-auc(h) 
-plot(h)
+result=cor(drop_na(temp6[c(3,4,6,7)]))
+corrplot(result,method='number',type = 'lower', diag = TRUE)
 
 ```
+
+
+
+
