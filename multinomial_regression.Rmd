@@ -1,0 +1,92 @@
+---
+title: "Multinomial_Regression"
+author: "Sumanth Nallamotu"
+date: "4/30/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(foreign)
+library(nnet)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(caret)
+library(yardstick)
+library(ggplot2)
+```
+
+## R Markdown
+
+
+```{r}
+fires <- read.csv("/Users/sumanth/Documents/GitHub/6101_Group5_Wildfires/final_wildfire.csv")
+
+fires$STAT_CAUSE_CODE <- as.factor(fires$STAT_CAUSE_CODE)
+fires$FIRE_SIZE_CLASS <- as.factor(fires$FIRE_SIZE_CLASS)
+
+split <- createDataPartition(fires$FIRE_SIZE_CLASS, p = .70, list = FALSE)
+train <- fires[split,]
+test <- fires[-split,]
+```
+
+```{r}
+model1 <- multinom(FIRE_SIZE_CLASS ~ tair_day_livneh_vic + 
+                     soilmoist1_day_livneh_vic + 
+                     rainfall_day_livneh_vic, data = fires)
+summary(model1)
+```
+```{r}
+train$predictions <- predict(model1, newdata = train, "class")
+tab <- table(train$FIRE_SIZE_CLASS, train$predictions)
+round((sum(diag(tab))/sum(tab))*100,2)
+
+cm <- confusionMatrix(train$predictions, train$FIRE_SIZE_CLASS)
+
+cmdf <- as.data.frame(cm$table)
+cmdf$Prediction <- factor(cmdf$Prediction, levels=rev(levels(cmdf$Prediction)))
+
+ggplot(cmdf, aes(Prediction,Reference, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size") +
+        scale_x_discrete(labels=c("A","B","C","D", "E",
+                                  "F","G")) +
+        scale_y_discrete(labels=c("A","B","C","D", "E",
+                                  "F","G"))
+```
+```{r}
+model2 <- multinom(STAT_CAUSE_CODE ~ month + tair_day_livneh_vic + 
+                     soilmoist1_day_livneh_vic + 
+                     rainfall_day_livneh_vic, data = fires)
+summary(model1)
+
+```
+```{r}
+# Predicting the values for train dataset
+train$predictions <- as.factor(predict(model2, newdata = train, "class"))
+
+# Building classification table
+tab <- table(train$STAT_CAUSE_CODE, train$predictions)
+
+# Calculating accuracy - sum of diagonal elements divided by total obs
+round((sum(diag(tab))/sum(tab))*100,2)
+
+cm2 <- confusionMatrix(train$predictions, train$STAT_CAUSE_CODE)
+
+cm2df <- as.data.frame(cm2$table)
+cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
+
+ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes") +
+        scale_x_discrete(labels=c("Lightning","Equipment","Smoking","Campfire", "Burning",
+                                  "Railroad","Arson", "Children", "Misc", "Fireworks",
+                                  "Powerline", "Structure", "N/A")) +
+        scale_y_discrete(labels=c("Lightning","Equipment","Smoking","Campfire", "Burning",
+                                  "Railroad","Arson", "Children", "Misc", "Fireworks",
+                                  "Powerline", "Structure", "N/A"))
+```
