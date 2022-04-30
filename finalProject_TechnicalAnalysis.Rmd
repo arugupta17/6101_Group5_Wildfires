@@ -203,3 +203,49 @@ ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
                                   "Railroad","Arson", "Children", "Misc", "Fireworks",
                                   "Powerline", "Structure", "N/A"))
 ```
+
+
+
+```{r}
+#Renaming variables in summary_nature
+Avg_Temp <- summary_nature$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_nature$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_nature$rainfall_day_livneh_vic
+```
+
+# Logistic Regression
+
+## LogTotal ~ nature variables
+
+```{r logitmodel}
+logitTotal <- glm(log(total)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+summary(logitTotal)
+```
+```{r results='markup'}
+xkabledply(logitTotal, title = paste("Logistic Regression :", format(formula(logitTotal)) ))
+
+#predict(logitTotal)
+```
+
+
+## FIRE_SIZE ~ nature variables
+```{r logitmodel}
+
+logitFireSize <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitFireSize)
+```
+```{r results='markup'}
+xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(logitFireSize)) ))
+```
+
+
+## Month ~ FIRE_SIZE + nature variables
+```{r logitmodel}
+logitMonth <- glm(month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitMonth)
+```
+```{r results='markup'}
+xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(logitMonth)) ))
+```
+
+
