@@ -486,7 +486,9 @@ xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model
 plot(model_areapeople)
 ```
 
-## 4.1 Decision Tree model for MultiClass Classification
+# 4 Decision Tree model for MultiClass Classification
+
+
 
 ```{r  echo=FALSE}
 #install.packages("caret")
@@ -496,7 +498,7 @@ library(caret)
 library(tidyverse)
 ```
 
-<<<<<<< HEAD
+
 ```{r  echo=FALSE}
 final_wildfire=read.csv('final_wildfire.csv')
 colnames(final_wildfire)[14]="Avg_Temp"
