@@ -38,6 +38,8 @@ model1 <- multinom(FIRE_SIZE_CLASS ~ tair_day_livneh_vic +
                      rainfall_day_livneh_vic, data = fires)
 summary(model1)
 ```
+
+
 ```{r}
 train$predictions <- predict(model1, newdata = train, "class")
 tab <- table(train$FIRE_SIZE_CLASS, train$predictions)
@@ -48,14 +50,10 @@ cm <- confusionMatrix(train$predictions, train$FIRE_SIZE_CLASS)
 cmdf <- as.data.frame(cm$table)
 cmdf$Prediction <- factor(cmdf$Prediction, levels=rev(levels(cmdf$Prediction)))
 
-ggplot(cmdf, aes(Prediction,Reference, fill= Freq)) +
+ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
         geom_tile() + geom_text(aes(label=Freq)) +
         scale_fill_gradient(low="white", high="#009194") +
-        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size") +
-        scale_x_discrete(labels=c("A","B","C","D", "E",
-                                  "F","G")) +
-        scale_y_discrete(labels=c("A","B","C","D", "E",
-                                  "F","G"))
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size")
 ```
 ```{r}
 model2 <- multinom(STAT_CAUSE_CODE ~ month + tair_day_livneh_vic + 
@@ -64,6 +62,7 @@ model2 <- multinom(STAT_CAUSE_CODE ~ month + tair_day_livneh_vic +
 summary(model1)
 
 ```
+
 ```{r}
 # Predicting the values for train dataset
 train$predictions <- as.factor(predict(model2, newdata = train, "class"))
@@ -82,11 +81,5 @@ cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)
 ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
         geom_tile() + geom_text(aes(label=Freq)) +
         scale_fill_gradient(low="white", high="#009194") +
-        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes") +
-        scale_x_discrete(labels=c("Lightning","Equipment","Smoking","Campfire", "Burning",
-                                  "Railroad","Arson", "Children", "Misc", "Fireworks",
-                                  "Powerline", "Structure", "N/A")) +
-        scale_y_discrete(labels=c("Lightning","Equipment","Smoking","Campfire", "Burning",
-                                  "Railroad","Arson", "Children", "Misc", "Fireworks",
-                                  "Powerline", "Structure", "N/A"))
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes")
 ```

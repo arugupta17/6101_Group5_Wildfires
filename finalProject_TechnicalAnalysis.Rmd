@@ -164,6 +164,115 @@ The result suppose that with temperature rainfall and soil moisture data from to
 If we try to make a convenient model that require only temperature to predict the probability,
 the AUC is 0.88.
 
+Multinomial Regression Models
+```{r}
+data_wildfire$STAT_CAUSE_CODE <- as.factor(data_wildfire$STAT_CAUSE_CODE)
+data_wildfire$FIRE_SIZE_CLASS <- as.factor(data_wildfire$FIRE_SIZE_CLASS)
+
+split <- createDataPartition(data_wildfire$FIRE_SIZE_CLASS, p = .70, list = FALSE)
+train <- data_wildfire[split,]
+test <- data_wildfire[-split,]
+```
+
+With our training data, we achieve an accuracy of 50.9% for predicting the
+fire size  class of a wildfire based on that month's condition. From our
+confusion matrix, it  seems that our model is biased towards predicting
+that a fire is of Class A, which makes sense because smaller fires are much
+more frequent than larger fires.
+```{r}
+model1 <- multinom(FIRE_SIZE_CLASS ~ tair_day_livneh_vic + 
+                     soilmoist1_day_livneh_vic + 
+                     rainfall_day_livneh_vic, data = train)
+summary(model1)
+train$predictions <- predict(model1, newdata = train, "class")
+cm <- confusionMatrix(train$predictions, train$FIRE_SIZE_CLASS)
+
+cmdf <- as.data.frame(cm$table)
+cmdf$Prediction <- factor(cmdf$Prediction, levels=rev(levels(cmdf$Prediction)))
+tab <- table(train$FIRE_SIZE_CLASS, train$predictions)
+round((sum(diag(tab))/sum(tab))*100,2)
+
+ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size")
+```
+
+Now, for our testing  data.  We achieve a similar accuracy of 50.8%
+```{r}
+test$predictions <- predict(model1, newdata = test, "class")
+tab <- table(test$FIRE_SIZE_CLASS, test$predictions)
+round((sum(diag(tab))/sum(tab))*100,2)
+
+cm <- confusionMatrix(test$predictions, test$FIRE_SIZE_CLASS)
+
+cmdf <- as.data.frame(cm$table)
+cmdf$Prediction <- factor(cmdf$Prediction, levels=rev(levels(cmdf$Prediction)))
+
+ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size")
+```
+
+
+Now, we try to predict the cause of the wildfire based on the conditions of that month
+```{r}
+model2 <- multinom(STAT_CAUSE_CODE ~ month + tair_day_livneh_vic + 
+                     soilmoist1_day_livneh_vic + 
+                     rainfall_day_livneh_vic, data = data_wildfire)
+summary(model2)
+
+```
+
+With  our training data, we achieve an accuracy of 30%. Looking at our
+confusion matrix for this model, is is a bit less biased  towards predicting
+a certain category. This makes sense  because  there does not seem to be one
+predominant cause of the wildfires in our dataset.
+```{r}
+# Predicting the values for train dataset
+train$predictions <- as.factor(predict(model2, newdata = train, "class"))
+
+# Building classification table
+tab <- table(train$STAT_CAUSE_CODE, train$predictions)
+
+# Calculating accuracy - sum of diagonal elements divided by total obs
+round((sum(diag(tab))/sum(tab))*100,2)
+
+cm2 <- confusionMatrix(train$predictions, train$STAT_CAUSE_CODE)
+
+cm2df <- as.data.frame(cm2$table)
+cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
+
+ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes")
+```
+Now, for the test data. We achieve a similar accuracy of 30%
+```{r}
+# Predicting the values for train dataset
+test$predictions <- as.factor(predict(model2, newdata = test, "class"))
+
+# Building classification table
+tab <- table(test$STAT_CAUSE_CODE, test$predictions)
+
+# Calculating accuracy - sum of diagonal elements divided by total obs
+round((sum(diag(tab))/sum(tab))*100,2)
+
+cm2 <- confusionMatrix(test$predictions, test$STAT_CAUSE_CODE)
+
+cm2df <- as.data.frame(cm2$table)
+cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
+
+ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
+        geom_tile() + geom_text(aes(label=Freq)) +
+        scale_fill_gradient(low="white", high="#009194") +
+        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes")
+
+
+```
+
 
 # 2. regression for long term 
 
