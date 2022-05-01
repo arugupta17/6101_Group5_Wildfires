@@ -10,6 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(ezids)
 knitr::opts_chunk$set(echo = FALSE,message=FALSE, warning=FALSE)
 ```
 
@@ -99,7 +100,7 @@ str(data_large2)
 
 model_large=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=data_large,family=binomial())
 #summary(model_large)
-xkabledply(model_large, title = "Logit Regression :", format(formula(model_large)))
+xkabledply(model_large, title = paste("Logit Regression :",format(formula(model_large)) ))
 
 library('pROC')
 prob=predict(model_large, type = "response" )
@@ -109,8 +110,8 @@ auc(h)
 plot(h)
 
 library("regclass")
-library("ezids")
 xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large fire predictor" )
+
 
 
 
@@ -125,7 +126,7 @@ To try to increase usability for the model, we try to make a model to predict th
 
 model_large=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic+soilmoist1_day_livneh_vic+rainfall_day_livneh_vic,data=data_large2,family=binomial())
 #summary(model_large)
-xkabledply(model_large, title = "Predicting Probability :", format(formula(model_large)))
+xkabledply(model_large, title = paste("Predicting Probability :", format(formula(model_large))))
 
 
 library('pROC')
@@ -147,7 +148,7 @@ xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large f
 
 model_large=glm(fire~tair_day_livneh_vic,data=data_large2,family=binomial())
 #summary(model_large)
-xkabledply(model_large, title = "Logit Regression :", format(formula(model_large)))
+xkabledply(model_large, title = paste("Logit Regression :", format(formula(model_large))))
 
 
 library('pROC')
@@ -329,19 +330,19 @@ Then, we take log to those predicted variable. Then the models are improved.
 #Total Fire Cases
 model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_case)
-xkabledply(model_case, title = "Linear Regression :", format(formula(model_case)))
+xkabledply(model_case, title = paste("Linear Regression :", format(formula(model_case))))
 plot(model_case)
 
 #Average Fire Size
 model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_avgsize)
-xkabledply(model_avgsize, title = "Linear Regression :", format(formula(model_avgsize)))
+xkabledply(model_avgsize, title = paste("Linear Regression :", format(formula(model_avgsize))))
 plot(model_avgsize)
 
 #Total Fire Area
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_totalarea)
-xkabledply(model_totalarea, title = "Linear Regression :", format(formula(model_totalarea)))
+xkabledply(model_totalarea, title = paste("Linear Regression :", format(formula(model_totalarea))))
 plot(model_totalarea)
 
 ```
