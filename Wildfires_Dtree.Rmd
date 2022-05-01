@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r pressure, echo=FALSE}
-install.packages("caret")
+#install.packages("caret")
 library(rpart)
 library(rpart.plot)
 library(caret)
@@ -45,7 +45,7 @@ data_test$FIRE_SIZE_CLASS = as.factor(data_test$FIRE_SIZE_CLASS)
 ```
 
 ```{r pressure, echo=FALSE}
-# specifying the CV technique which will be passed into the train() function later and number parameter is the "k" in K-fold cross validation
+# specifying the technique which will be passed into the train() function later and number parameter is the "k" in K-fold cross validation
 train_control = trainControl(method = "cv", number = 5, search = "grid")
 
 ## Customsing the tuning grid (ridge regression has alpha = 0)
@@ -70,9 +70,64 @@ pred_y = predict(model, data_test)
 confusionMatrix(data = pred_y, data_test$FIRE_SIZE_CLASS)
 ```
 
+#############################################################
 ```{r pressure, echo=FALSE} 
+#predicting only fire classes A and B.
 ```
 
+```{r pressure, echo=FALSE}
+fit <- rpart(FIRE_SIZE_CLASS~., data = data_train, method = 'class')
+rpart.plot(fit, extra = 106)
+```
+
+```{r pressure, echo=FALSE}
+#Prediction
+predict_unseen <-predict(fit, data_test, type = 'class')
+```
+
+```{r pressure, echo=FALSE}
+table_mat <- table(data_test$FIRE_SIZE_CLASS, predict_unseen)
+table_mat
+```
+
+```{r pressure, echo=FALSE}
+#accuracy test
+accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
+print(paste('Accuracy for test', accuracy_Test))
+```
+
+```{r pressure, echo=FALSE}
+#Tune parameters
+accuracy_tune <- function(fit) {
+    predict_unseen <- predict(fit, data_test, type = 'class')
+    table_mat <- table(data_test$FIRE_SIZE_CLASS, predict_unseen)
+    accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
+    accuracy_Test
+}
+
+control <- rpart.control(minsplit = 4,
+    minbucket = round(5 / 3),
+    maxdepth = 3,
+    cp = 0)
+tune_fit <- rpart(FIRE_SIZE_CLASS~., data = data_train, method = 'class', control = control)
+accuracy_tune(tune_fit)
+
+```
+
+```{r pressure, echo=FALSE}
+# confusion Matrix
+confusionMatrix(data = predict_unseen, data_test$FIRE_SIZE_CLASS)
+```
+
+```{r pressure, echo=FALSE}
+#Prediction 2 after tuning
+predict_unseen2 <-predict(tune_fit, data_test, type = 'class')
+```
+
+```{r pressure, echo=FALSE}
+# confusion Matrix
+confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
+```
 ```{r pressure, echo=FALSE}
 
 ```
