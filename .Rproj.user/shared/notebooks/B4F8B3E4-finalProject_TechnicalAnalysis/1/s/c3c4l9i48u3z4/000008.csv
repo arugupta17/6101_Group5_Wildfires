@@ -1,0 +1,5 @@
+"0",""
+"0","library(corrplot)"
+"0","joined4$totalarea=joined4$n*joined4$FIRE_SIZE"
+"0","cor_fire=cor(joined4[c(3,4,5,6,7,8)])"
+"0","corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)"

@@ -6,8 +6,8 @@ output: html_document
 ---
 
 ## R Markdown
-```{r pressure, echo=FALSE}
-install.packages("rpart.plot")
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r pressure, echo=FALSE}
@@ -19,17 +19,17 @@ library(tidyverse)
 ```
 
 ```{r pressure, echo=FALSE}
-myvars <- c("v1", "v2", "v3")
-newdata <- mydata[myvars]
+# createDataset
+myvars <- c("Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "FIRE_SIZE_CLASS")
+mdb <- final_wildfire[myvars]
 ```
 
 ```{r pressure, echo=FALSE}
-create_train_test(df, size = 0.8, train = TRUE)
-
+# createDataPartition
 create_train_test <- function(data, size = 0.8, train = TRUE) {
     n_row = nrow(data)
     total_row = size * n_row
-    train_sample < - 1: total_row
+    train_sample <- 1: total_row
     if (train == TRUE) {
         return (data[train_sample, ])
     } else {
@@ -45,7 +45,7 @@ data_test$FIRE_SIZE_CLASS = as.factor(data_test$FIRE_SIZE_CLASS)
 ```
 
 ```{r pressure, echo=FALSE}
-# specifying the CV technique which will be passed into the train() function later and number parameter is the "k" in K-fold cross validation
+# specifying the technique which will be passed into the train() function later and number parameter is the "k" in K-fold cross validation
 train_control = trainControl(method = "cv", number = 5, search = "grid")
 
 ## Customsing the tuning grid (ridge regression has alpha = 0)
@@ -69,6 +69,7 @@ pred_y = predict(model, data_test)
 # confusion Matrix
 confusionMatrix(data = pred_y, data_test$FIRE_SIZE_CLASS)
 ```
+
 #############################################################
 ```{r pressure, echo=FALSE} 
 #predicting only fire classes A and B.
@@ -127,6 +128,6 @@ predict_unseen2 <-predict(tune_fit, data_test, type = 'class')
 # confusion Matrix
 confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
 ```
-
 ```{r pressure, echo=FALSE}
+
 ```

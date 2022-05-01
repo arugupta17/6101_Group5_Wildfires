@@ -1,0 +1,361 @@
+---
+title: "finalProject_Analysis"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message=FALSE, warning=FALSE)
+```
+
+R Markdown
+
+
+```{r cars}
+library(foreign)
+library(nnet)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(caret)
+library(yardstick)
+library(ggplot2)
+```
+
+#  1.Large fire predictor
+
+In EDA, we find that the fire size class in California have very high frequency in A and B size.
+Those size of wildfire may not be a threats to environment and properties since they could disappear soon.
+The size of C class and above could be dangerous as the burned size grow fast.
+
+prepare the data
+data are labeled with large fire or not  from 1992 to 2015, each data have 3 features as daily temperature
+soil moisture and rainfall in average of California.
+
+```{r  results='markup'}
+library(dplyr)
+data_wildfire=read.csv('final_wildfire.csv')
+data_large=subset(data_wildfire, FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
+temp3=data_large %>% count(Year, DISCOVERY_DOY)
+rainfall <- read.csv("rainfall_daily.csv")
+soilmoisture <- read.csv("soilmoisture_daily.csv")
+airtemp <- read.csv("airtemp_daily.csv")
+airtemp$month <- strftime(airtemp$time, "%m")
+airtemp$year <- strftime(airtemp$time, "%Y")
+airtemp$DOY <- strftime(airtemp$time, "%j")
+rainfall$year <- strftime(rainfall$time, "%Y")
+rainfall$DOY <- strftime(airtemp$time, "%j")
+
+cleaned_rainfall <- subset(rainfall, select = -c(time))
+str(airtemp)
+cleaned_airtemp <- subset(airtemp, select = -c(time))
+soilmoisture$year <- strftime(rainfall$time, "%Y")
+soilmoisture$DOY <- strftime(airtemp$time, "%j")
+
+cleaned_soilmoisture <- subset(soilmoisture, select = -c(time))
+joined1 <- merge(cleaned_airtemp, cleaned_soilmoisture, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
+joined2 <- merge(joined1, cleaned_rainfall, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
+joined2$year=as.integer(joined2$year)
+joined2$DOY=as.integer(joined2$DOY)
+```
+
+```{r results='markup' }
+str(joined2)
+
+joined2=subset(joined2, year>= 1992 & year<= 2015)
+joined5=joined2
+joined5$DOY=joined5$DOY + 1
+
+
+data_large=merge(joined2,temp3, by.x=c('year','DOY'),by.y=c('Year','DISCOVERY_DOY'),all.x=T)
+data_large$n[is.na(data_large$n)]=0
+data_large$fire=1
+data_large$fire[data_large$n==0]=0
+str(data_large)
+data_large2=merge(joined5,temp3, by.x=c('year','DOY'),by.y=c('Year','DISCOVERY_DOY'),all.x=T)
+data_large2$n[is.na(data_large2$n)]=0
+data_large2$fire=1
+data_large2$fire[data_large2$n==0]=0
+
+for (i in range(1992,2015)){
+  tdate=max(subset(data_large2,year==i)$DOY)
+  data_large2$year[data_large$year == i & data_large2$DOY==tdate]=i+1
+  data_large2$DOY[data_large$year == i & data_large2$DOY==tdate]=1
+}
+str(data_large2)
+
+```
+
+
+large fire prediction model, by logit regression
+
+
+```{r results='markup' }
+
+model_large=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=data_large,family=binomial())
+summary(model_large)
+
+library('pROC')
+prob=predict(model_large, type = "response" )
+data_large$prob=prob
+h = roc(fire~prob, data=data_large)
+auc(h) 
+plot(h)
+
+library("regclass")
+library("ezids")
+xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large fire predictor" )
+
+
+
+
+```
+
+try to increase usability for the model, we try to make a model to predict the probability in next day
+
+
+
+```{r results='markup'}
+
+model_large=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic+soilmoist1_day_livneh_vic+rainfall_day_livneh_vic,data=data_large2,family=binomial())
+summary(model_large)
+
+library('pROC')
+prob=predict(model_large, type = "response" )
+data_large2$prob=prob
+h = roc(fire~prob, data=data_large2)
+auc(h) 
+plot(h)
+
+library("regclass")
+library("ezids")
+xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large fire predictor" )
+
+
+
+
+```
+```{r results='markup'}
+
+model_large=glm(fire~tair_day_livneh_vic,data=data_large2,family=binomial())
+summary(model_large)
+
+library('pROC')
+prob=predict(model_large, type = "response" )
+data_large2$prob=prob
+h = roc(fire~prob, data=data_large2)
+auc(h) 
+plot(h)
+
+library("regclass")
+library("ezids")
+xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large fire predictor" )
+
+
+
+
+```
+The result suppose that with temperature rainfall and soil moisture data from today; We have AUC 0.9 for predicting the the large fire in next day
+If we try to make a convenient model that require only temperature to predict the probability,
+the AUC is 0.88.
+
+
+# 2. regression for long term 
+
+We are also want to evaluate the long term effect on the wildfires by nature factors.
+We try to predict the case, average firesize and total burned fire by nature factors.
+
+
+
+## 2.1 regression for case,firesize, total burning area
+
+
+```{r}
+temp=aggregate(tair_day_livneh_vic~Year+month,data=data_wildfire,mean)
+temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
+joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
+temp1=data_wildfire %>% count(Year, month)
+
+temp2=aggregate(FIRE_SIZE~Year+month,data=data_wildfire,mean)
+joined4 = merge(temp2, temp1, by.x=c('Year', 'month'), by.y=c('Year', 'month'))
+joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'))
+
+
+
+```
+
+```{r results='markup'}
+
+library(corrplot)
+joined4$totalarea=joined4$n*joined4$FIRE_SIZE
+cor_fire=cor(joined4[c(3,4,5,6,7,8)])
+corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
+```
+
+From the corrplot, we can find that the number of case have strong correlation with environment variable.
+And the fire size, total area burned have some correlation with environment variable.
+We try to use linear model for those predicted variable, the result suppose that the model is not fit well.
+Then, we take log to those predicted variable. Then the models are improved.
+
+
+
+
+
+
+```{r results='markup'}
+model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_case)
+plot(model_case)
+model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_avgsize)
+plot(model_avgsize)
+model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_totalarea)
+
+plot(model_totalarea)
+```
+We have the model that r-squared value for model of cases 0.9
+model of average fire size 0.5377
+model of average total burned size with 0.7825
+By the plot check we found that the cases and burned area model fit the linear model assumption well.
+
+
+
+```{r}
+temp=aggregate(tair_day_livneh_vic~Year+month,data=data_wildfire,mean)
+temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
+joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
+temp1=subset(data_wildfire, FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
+temp2=aggregate(FIRE_SIZE~Year+month,data=temp1,mean)
+temp1=temp1 %>% count(Year, month)
+
+
+joined4 = merge(temp2, temp1, by.x=c('Year', 'month'), by.y=c('Year', 'month'))
+joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'))
+
+
+
+```
+
+## 2.2 Large wildfire(c class or above) model
+
+We build models to predict the large wildfire number firesize and total burned area.
+```{r results='markup'}
+
+library(corrplot)
+joined4$totalarea=joined4$n*joined4$FIRE_SIZE
+cor_fire=cor(joined4[c(3,4,5,6,7,8)])
+corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
+
+model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_case)
+plot(model_case)
+model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_avgsize)
+plot(model_avgsize)
+model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_totalarea)
+
+
+plot(model_totalarea)
+
+```
+
+We have the model that r-squared value for model of cases 0.8616
+model of average fire size 0.3366
+model of average total burned size with 0.7391
+By the plot check we found that the model of large fire case does not fit well as the residual is not consistent.
+And the model of average large fire size result shows lack of some normality from qq-plot.
+
+
+# 3. Regression of wildfires with different cause(natrual or people-caused)
+
+
+```{r }
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+
+```
+
+```{r}
+#Renaming variables in summary_nature
+Avg_Temp <- summary_nature$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_nature$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_nature$rainfall_day_livneh_vic
+
+#Renaming variables in summary_peoplecaused
+Avg_Temp <- summary_peoplecaused$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_peoplecaused$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
+```
+
+
+
+## 3.1 Model for cases 
+
+
+```{r }
+## Logn ~ nature variables        - PEOPLE CAUSED (P)
+model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+summary(model_npeople)
+plot(model_npeople)
+
+model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+summary(model_nnature)
+plot(model_nnature)
+
+
+```
+
+
+
+## 3.2 Model for fire size
+```{r }
+
+## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
+model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+summary(model_sizenature)
+plot(model_sizenature)
+model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+
+summary(model_sizepeople)
+plot(model_sizepeople)
+
+```
+
+
+## 3.3 Model for burning area
+
+```{r }
+model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+summary(model_areanature)
+plot(model_areanature)
+model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+summary(model_areapeople)
+plot(model_areapeople)
+```
+
+
+
+
+
+
+
+
+
+
+
+

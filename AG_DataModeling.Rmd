@@ -29,7 +29,17 @@ options(scientific=T, digits = 3)
 # use scipen=999 to prevent scientific notation at all times
 ```
 
-```{r base_lib}
+```{r}
+
+# Installing Packages
+install.packages("e1071")
+install.packages("caTools")
+install.packages("class")
+  
+# Loading package
+library(e1071)
+library(caTools)
+library(class)
 loadPkg("ggplot2")
 ```
 
@@ -66,16 +76,21 @@ totalFiretable
 ```
 
 
+# Logistic Regression
+
 ```{r logitmodel}
-logitTotal <- glm(total~Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+logitTotal <- glm(log(total)~Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitTotal)
 ```
 ```{r results='markup'}
 xkabledply(logitTotal, title = paste("Logistic Regression :", format(formula(logitTotal)) ))
+#predict(logitTotal)
 ```
 
 
 ```{r logitmodel}
 logitFireSize <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitFireSize)
 ```
 ```{r results='markup'}
 xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(logitFireSize)) ))
@@ -83,14 +98,83 @@ xkabledply(logitFireSize, title = paste("Logistic Regression :", format(formula(
 
 
 ```{r logitmodel}
-logitMonth <- glm(Month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+logitMonth <- glm(month ~ FIRE_SIZE + Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+#summary(logitMonth)
 ```
 ```{r results='markup'}
 xkabledply(logitMonth, title = paste("Logistic Regression :", format(formula(logitMonth)) ))
 ```
 
+#Basic Visualization 
+
+```{r}
+loadPkg("FNN")
+#For this example we are going to use the IRIS data set in R
+str(summary_nature)
+#Budget <- as.integer(summary_nature$Budget)
+summary_nature = subset(summary_nature, select = -c(Budget))
+
+str(summary_nature)
+
+loadPkg('ggplot2')
+```
+
+```{r}
+for (xx in 1:(length(summary_nature)-2) ) {
+  for (yy in (xx+1):(length(summary_nature)-1) ) {
+    print(xx)
+    print(yy)
+    p <- ggplot(summary_nature, aes(x=summary_nature[,xx], y=summary_nature[,yy], color=FIRE_SIZE)) + 
+       geom_point() +
+      scale_color_manual(labs( x = colnames(summary_nature)[xx], y = colnames(summary_nature)[yy]) )
+    print(p)
+  }}
+  
+```
+
+#KNN
+
+```{r}
+scaledWildfires <- as.data.frame(scale(summary_nature[1:7], center = TRUE, scale = TRUE))
+set.seed(321)
 
 
+# Splitting data into train and test data
+split <- sample.split(summary_nature, SplitRatio = 0.7)
+train_wildfires <- subset(summary_nature, split == "TRUE")
+test_wildfires <- subset(summary_nature, split == "FALSE")
+
+
+
+# Feature Scaling
+train_scale <- scale(train_wildfires[, 1:4])
+test_scale <- scale(test_wildfires[, 1:4])
+  
+# Fitting KNN Model to training data set
+classifier_knn <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_wildfires$FIRE_SIZE,
+                      k = 1)
+classifier_knn
+
+# Confusion Matrix
+cm <- table(test_wildfires$FIRE_SIZE, classifier_knn)
+cm
+  
+
+# Model Evaluation - Choosing K. Calculate out of Sample error
+misClassError <- mean(classifier_knn != test_wildfires$FIRE_SIZE)
+print(paste('Accuracy =', 1-misClassError))
+  
+# K = 3
+classifier_knn <- knn(train = train_scale,
+                      test = test_scale,
+                      cl = train_wildfires$FIRE_SIZE,
+                      k = 100)
+misClassError <- mean(classifier_knn != test_wildfires$FIRE_SIZE)
+print(paste('Accuracy =', 1-misClassError))
+
+```
 
 
 
