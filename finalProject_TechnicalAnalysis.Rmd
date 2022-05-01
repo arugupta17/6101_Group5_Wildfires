@@ -217,18 +217,14 @@ plot(model_sizenature)
 model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
 summary(model_sizepeople)
 plot(model_sizepeople)
+model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+summary(model_areanature)
+plot(model_areanature)
+model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+summary(model_areapeople)
+plot(model_areapeople)
 ```
-```{r results='markup'}
-xkabledply(logitFireSizeN, title = paste("Logistic Regression :", format(formula(logitFireSizeN)) ))
-```
-```{r logitmodel}
 
-## FIRE_SIZE ~ nature variables       - PEOPLE CAUSED (P)
-logitFireSizeP <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
-summary(logitFireSizeP)
-```
-```{r results='markup'}
-xkabledply(logitFireSizeP, title = paste("Logistic Regression :", format(formula(logitFireSizeP)) ))
 ```{r}
 model1 <- multinom(FIRE_SIZE_CLASS ~ tair_day_livneh_vic + 
                      soilmoist1_day_livneh_vic + 
