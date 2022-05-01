@@ -429,16 +429,17 @@ Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
 ## 3.1 Model for all fire incidents 
 
 ```{r }
-## Logn ~ nature variables        - PEOPLE CAUSED (P)
-model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
-summary(model_npeople)
-plot(model_npeople)
-
 model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-summary(model_nnature)
+#summary(model_nnature)
+xkabledply(model_nnature, title = paste("Nature Caused:",format(formula(model_nnature)) ))
 plot(model_nnature)
 
 
+## Logn ~ nature variables        - PEOPLE CAUSED (P)
+model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+#summary(model_npeople)
+xkabledply(model_npeople, title = paste("People Caused:",format(formula(model_npeople)) ))
+plot(model_npeople)
 ```
 
 
@@ -448,11 +449,14 @@ plot(model_nnature)
 
 ## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
 model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-summary(model_sizenature)
+#summary(model_sizenature)
+xkabledply(model_sizenature, title = paste("Nature Caused:",format(formula(model_sizenature)) ))
 plot(model_sizenature)
-model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
 
-summary(model_sizepeople)
+
+model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+#summary(model_sizepeople)
+xkabledply(model_sizepeople, title = paste("People Caused:",format(formula(model_sizepeople) )))
 plot(model_sizepeople)
 
 ```
@@ -462,10 +466,14 @@ plot(model_sizepeople)
 
 ```{r }
 model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-summary(model_areanature)
+#summary(model_areanature)
+xkabledply(model_areanature, title = paste("Nature Caused:",format(formula(model_areanature)) ))
 plot(model_areanature)
+
+
 model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
-summary(model_areapeople)
+#summary(model_areapeople)
+xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model_areapeople) )))
 plot(model_areapeople)
 ```
 
