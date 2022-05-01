@@ -384,14 +384,18 @@ cor_fire=cor(joined4[c(3,4,5,6,7,8)])
 corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
 
 model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
-summary(model_case)
+#summary(model_case)
+xkabledply(model_case, title = paste("Case Model:",format(formula(model_case)) ))
 plot(model_case)
-model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
-summary(model_avgsize)
-plot(model_avgsize)
-model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
-summary(model_totalarea)
 
+model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+#summary(model_avgsize)
+xkabledply(model_avgsize, title = paste("Avg. Size Model Model:",format(formula(model_avgsize)) ))
+plot(model_avgsize)
+
+model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+#summary(model_totalarea)
+xkabledply(model_totalarea, title = paste("Burn Area Model:",format(formula(model_totalarea)) ))
 
 plot(model_totalarea)
 
