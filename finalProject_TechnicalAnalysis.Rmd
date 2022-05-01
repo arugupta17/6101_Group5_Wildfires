@@ -10,6 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(ezids)
 knitr::opts_chunk$set(echo = FALSE,message=FALSE, warning=FALSE)
 ```
 
@@ -99,7 +100,7 @@ str(data_large2)
 
 model_large=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic,data=data_large,family=binomial())
 #summary(model_large)
-xkabledply(model_large, title = "Logit Regression :", format(formula(model_large)))
+xkabledply(model_large, title = paste("Logit Regression :",format(formula(model_large)) ))
 
 library('pROC')
 prob=predict(model_large, type = "response" )
@@ -109,8 +110,8 @@ auc(h)
 plot(h)
 
 library("regclass")
-library("ezids")
 xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large fire predictor" )
+
 
 
 
@@ -125,7 +126,7 @@ To try to increase usability for the model, we try to make a model to predict th
 
 model_large=glm(fire~tair_day_livneh_vic+soilmoist1_day_livneh_vic+soilmoist1_day_livneh_vic+rainfall_day_livneh_vic,data=data_large2,family=binomial())
 #summary(model_large)
-xkabledply(model_large, title = "Predicting Probability :", format(formula(model_large)))
+xkabledply(model_large, title = paste("Predicting Probability :", format(formula(model_large))))
 
 
 library('pROC')
@@ -147,7 +148,7 @@ xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large f
 
 model_large=glm(fire~tair_day_livneh_vic,data=data_large2,family=binomial())
 #summary(model_large)
-xkabledply(model_large, title = "Logit Regression :", format(formula(model_large)))
+xkabledply(model_large, title = paste("Logit Regression :", format(formula(model_large))))
 
 
 library('pROC')
@@ -329,19 +330,19 @@ Then, we take log to those predicted variable. Then the models are improved.
 #Total Fire Cases
 model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_case)
-xkabledply(model_case, title = "Linear Regression :", format(formula(model_case)))
+xkabledply(model_case, title = paste("Linear Regression :", format(formula(model_case))))
 plot(model_case)
 
 #Average Fire Size
 model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_avgsize)
-xkabledply(model_avgsize, title = "Linear Regression :", format(formula(model_avgsize)))
+xkabledply(model_avgsize, title = paste("Linear Regression :", format(formula(model_avgsize))))
 plot(model_avgsize)
 
 #Total Fire Area
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_totalarea)
-xkabledply(model_totalarea, title = "Linear Regression :", format(formula(model_totalarea)))
+xkabledply(model_totalarea, title = paste("Linear Regression :", format(formula(model_totalarea))))
 plot(model_totalarea)
 
 ```
@@ -383,14 +384,18 @@ cor_fire=cor(joined4[c(3,4,5,6,7,8)])
 corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
 
 model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
-summary(model_case)
+#summary(model_case)
+xkabledply(model_case, title = paste("Case Model:",format(formula(model_case)) ))
 plot(model_case)
-model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
-summary(model_avgsize)
-plot(model_avgsize)
-model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
-summary(model_totalarea)
 
+model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+#summary(model_avgsize)
+xkabledply(model_avgsize, title = paste("Avg. Size Model Model:",format(formula(model_avgsize)) ))
+plot(model_avgsize)
+
+model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+#summary(model_totalarea)
+xkabledply(model_totalarea, title = paste("Burn Area Model:",format(formula(model_totalarea)) ))
 
 plot(model_totalarea)
 
@@ -428,16 +433,17 @@ Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
 ## 3.1 Model for all fire incidents 
 
 ```{r }
-## Logn ~ nature variables        - PEOPLE CAUSED (P)
-model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
-summary(model_npeople)
-plot(model_npeople)
-
 model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-summary(model_nnature)
+#summary(model_nnature)
+xkabledply(model_nnature, title = paste("Nature Caused:",format(formula(model_nnature)) ))
 plot(model_nnature)
 
 
+## Logn ~ nature variables        - PEOPLE CAUSED (P)
+model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+#summary(model_npeople)
+xkabledply(model_npeople, title = paste("People Caused:",format(formula(model_npeople)) ))
+plot(model_npeople)
 ```
 
 
@@ -447,11 +453,14 @@ plot(model_nnature)
 
 ## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
 model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-summary(model_sizenature)
+#summary(model_sizenature)
+xkabledply(model_sizenature, title = paste("Nature Caused:",format(formula(model_sizenature)) ))
 plot(model_sizenature)
-model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
 
-summary(model_sizepeople)
+
+model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+#summary(model_sizepeople)
+xkabledply(model_sizepeople, title = paste("People Caused:",format(formula(model_sizepeople) )))
 plot(model_sizepeople)
 
 ```
@@ -461,10 +470,14 @@ plot(model_sizepeople)
 
 ```{r }
 model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
-summary(model_areanature)
+#summary(model_areanature)
+xkabledply(model_areanature, title = paste("Nature Caused:",format(formula(model_areanature)) ))
 plot(model_areanature)
+
+
 model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
-summary(model_areapeople)
+#summary(model_areapeople)
+xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model_areapeople) )))
 plot(model_areapeople)
 ```
 
