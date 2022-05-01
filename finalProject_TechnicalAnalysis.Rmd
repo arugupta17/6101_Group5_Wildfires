@@ -170,14 +170,18 @@ The results suppose that with temperature rainfall and soil moisture data from t
 If we try to make a convenient model that require only temperature to predict the probability,
 the AUC is 0.88.
 
-Multinomial Regression Models
+## 1.2 Multinomial Regression Models
+
+we are try to figure out that can we predict the specific fire size
+of a large wildfire(class c or above)
+
 ```{r}
 data_wildfire$STAT_CAUSE_CODE <- as.factor(data_wildfire$STAT_CAUSE_CODE)
 data_wildfire$FIRE_SIZE_CLASS <- as.factor(data_wildfire$FIRE_SIZE_CLASS)
-
-split <- createDataPartition(data_wildfire$FIRE_SIZE_CLASS, p = .70, list = FALSE)
-train <- data_wildfire[split,]
-test <- data_wildfire[-split,]
+temp8= subset(data_wildfire, FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
+split <- createDataPartition(temp8$FIRE_SIZE_CLASS, p = .70, list = FALSE)
+train <- temp8[split,]
+test <- temp8[-split,]
 ```
 
 With our training data, we achieve an accuracy of 50.9% for predicting the
@@ -204,7 +208,7 @@ ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
         labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size")
 ```
 
-Now, for our testing  data.  We achieve a similar accuracy of 50.8%
+
 ```{r}
 test$predictions <- predict(model1, newdata = test, "class")
 tab <- table(test$FIRE_SIZE_CLASS, test$predictions)
@@ -220,7 +224,8 @@ ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
         scale_fill_gradient(low="white", high="#009194") +
         labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size")
 ```
-
+We found that since the large wildfire dataset is not balanced, the model
+fails to predict class since the model strongly predict results as C class, this suppose that we need more data and try alternative model on predict such categroy.
 
 Now, we try to predict the cause of the wildfire based on the conditions of that month
 ```{r}
@@ -483,7 +488,7 @@ plot(model_areapeople)
 
 ## 4.1 Decision Tree model for MultiClass Classification
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 #install.packages("caret")
 library(rpart)
 library(rpart.plot)
@@ -491,14 +496,21 @@ library(caret)
 library(tidyverse)
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
+final_wildfire=read.csv('final_wildfire.csv')
+colnames(final_wildfire)[14]="Avg_Temp"
+colnames(final_wildfire)[16]="Avg_SoilMoisture"
+colnames(final_wildfire)[17]="Avg_Rainfall"
 # Model to predict Fire class using "Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "FIRE_SIZE_CLASS".
 # createDataset
 myvars <- c("Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "FIRE_SIZE_CLASS")
-mdb <- final_wildfire[myvars]
+myvars <- c("Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "FIRE_SIZE_CLASS")
+temp8=final_wildfire
+#subset( final_wildfire,FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
+mdb <- temp8[myvars]
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 # createDataPartition
 create_train_test <- function(data, size = 0.8, train = TRUE) {
     n_row = nrow(data)
@@ -512,13 +524,13 @@ create_train_test <- function(data, size = 0.8, train = TRUE) {
 }
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 data_train <- create_train_test(mdb, 0.8, train = TRUE)
 data_test <- create_train_test(mdb, 0.8, train = FALSE)
 data_test$FIRE_SIZE_CLASS = as.factor(data_test$FIRE_SIZE_CLASS)
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 # specifying the technique which will be passed into the train() function later and number parameter is the "k" in K-fold cross validation
 train_control = trainControl(method = "cv", number = 5, search = "grid")
 
@@ -534,40 +546,37 @@ model = train(FIRE_SIZE_CLASS~., data = data_train, method = "rpart2", trControl
 print(model)
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 #use model to make predictions on test data
 pred_y = predict(model, data_test)
 ```
 
-```{r pressure, echo=FALSE}
-# confusion Matrix
-confusionMatrix(data = pred_y, data_test$FIRE_SIZE_CLASS)
-```
 
-## 4.2 predicting fire classes A and B using Decision Tree.
 
-```{r pressure, echo=FALSE}
+## 4.2 predicting fire classes C,D,E,F using Decision Tree.
+
+```{r  echo=FALSE}
 fit <- rpart(FIRE_SIZE_CLASS~., data = data_train, method = 'class')
 rpart.plot(fit, extra = 106)
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 #Prediction
 predict_unseen <-predict(fit, data_test, type = 'class')
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 table_mat <- table(data_test$FIRE_SIZE_CLASS, predict_unseen)
 table_mat
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 #accuracy test
 accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
 print(paste('Accuracy for test', accuracy_Test))
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 #Tune parameters
 accuracy_tune <- function(fit) {
     predict_unseen <- predict(fit, data_test, type = 'class')
@@ -585,17 +594,17 @@ accuracy_tune(tune_fit)
 
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 # confusion Matrix
 confusionMatrix(data = predict_unseen, data_test$FIRE_SIZE_CLASS)
 ```
 
 ## 4.3 predicting fire classes A and B after tuning model fit.
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 predict_unseen2 <-predict(tune_fit, data_test, type = 'class')
 ```
 
-```{r pressure, echo=FALSE}
+```{r  echo=FALSE}
 # confusion Matrix
 confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
 ```
