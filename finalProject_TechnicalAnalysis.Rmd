@@ -496,6 +496,7 @@ library(caret)
 library(tidyverse)
 ```
 
+<<<<<<< HEAD
 ```{r  echo=FALSE}
 final_wildfire=read.csv('final_wildfire.csv')
 colnames(final_wildfire)[14]="Avg_Temp"
@@ -508,6 +509,7 @@ myvars <- c("Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "
 temp8=final_wildfire
 #subset( final_wildfire,FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
 mdb <- temp8[myvars]
+
 ```
 
 ```{r  echo=FALSE}
