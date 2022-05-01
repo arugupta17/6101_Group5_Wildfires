@@ -131,15 +131,104 @@ summary(model_totalarea)
 
 ```
 
-```{r}
-data_wildfire$STAT_CAUSE_CODE <- as.factor(data_wildfire$STAT_CAUSE_CODE)
-data_wildfire$FIRE_SIZE_CLASS <- as.factor(data_wildfire$FIRE_SIZE_CLASS)
 
-split <- createDataPartition(data_wildfire$FIRE_SIZE_CLASS, p = .70, list = FALSE)
-train <- data_wildfire[split,]
-test <- data_wildfire[-split,]
+```{r}
+temp=aggregate(tair_day_livneh_vic~Year+month,data=data_wildfire,mean)
+temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
+joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
+temp1=subset(data_wildfire, FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
+temp2=aggregate(FIRE_SIZE~Year+month,data=temp1,mean)
+temp1=temp1 %>% count(Year, month)
+
+
+joined4 = merge(temp2, temp1, by.x=c('Year', 'month'), by.y=c('Year', 'month'))
+joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'))
+
+
+
 ```
 
+```{r results='markup'}
+
+library(corrplot)
+joined4$totalarea=joined4$n*joined4$FIRE_SIZE
+cor_fire=cor(joined4[c(3,4,5,6,7,8)])
+corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
+
+model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_case)
+model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_avgsize)
+
+model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_totalarea)
+
+```
+
+
+# Regression of wildfires with different cause
+```{r }
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+
+```
+
+```{r}
+#Renaming variables in summary_nature
+Avg_Temp <- summary_nature$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_nature$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_nature$rainfall_day_livneh_vic
+
+#Renaming variables in summary_peoplecaused
+Avg_Temp <- summary_peoplecaused$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_peoplecaused$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
+```
+
+# Regression
+
+## nature variables
+
+
+```{r logitmodel}
+## Logn ~ nature variables        - PEOPLE CAUSED (P)
+model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+summary(model_npeople)
+plot(model_npeople)
+
+model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+summary(model_nnature)
+plot(model_nnature)
+```
+
+
+
+## FIRE_SIZE ~ nature variables
+```{r logitmodel}
+
+## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
+model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+summary(model_sizenature)
+plot(model_sizenature)
+model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+summary(model_sizepeople)
+plot(model_sizepeople)
+```
+```{r results='markup'}
+xkabledply(logitFireSizeN, title = paste("Logistic Regression :", format(formula(logitFireSizeN)) ))
+```
+```{r logitmodel}
+
+## FIRE_SIZE ~ nature variables       - PEOPLE CAUSED (P)
+logitFireSizeP <- glm(FIRE_SIZE ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+summary(logitFireSizeP)
+```
+```{r results='markup'}
+xkabledply(logitFireSizeP, title = paste("Logistic Regression :", format(formula(logitFireSizeP)) ))
 ```{r}
 model1 <- multinom(FIRE_SIZE_CLASS ~ tair_day_livneh_vic + 
                      soilmoist1_day_livneh_vic + 
