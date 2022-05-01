@@ -1,0 +1,4 @@
+"0",""
+"0","library(""regclass"")"
+"0","library(""ezids"")"
+"0","xkabledply( confusion_matrix(model_large), title = ""Confusion matrix for large fire predictor"" )"
