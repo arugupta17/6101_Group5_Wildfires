@@ -1,6 +1,12 @@
 ---
 title: "finalProject_Analysis"
-output: html_document
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -166,7 +172,7 @@ We try to predict the case, average firesize and total burned fire by nature fac
 
 
 
-
+## 2.1 regression for case,firesize, total burning area
 
 
 ```{r}
@@ -208,13 +214,13 @@ Then, we take log to those predicted variable. Then the models are improved.
 ```{r results='markup'}
 model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 summary(model_case)
+plot(model_case)
 model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 summary(model_avgsize)
-
+plot(model_avgsize)
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 summary(model_totalarea)
-plot(model_case)
-plot(model_avgsize)
+
 plot(model_totalarea)
 ```
 We have the model that r-squared value for model of cases 0.9
@@ -244,7 +250,7 @@ joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'
 
 ```
 
-# Large wildfire(c class or above) model
+## 2.2 Large wildfire(c class or above) model
 
 We build models to predict the large wildfire number firesize and total burned area.
 ```{r results='markup'}
@@ -256,13 +262,14 @@ corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
 
 model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 summary(model_case)
+plot(model_case)
 model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 summary(model_avgsize)
-
+plot(model_avgsize)
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 summary(model_totalarea)
-plot(model_case)
-plot(model_avgsize)
+
+
 plot(model_totalarea)
 
 ```
@@ -274,7 +281,7 @@ By the plot check we found that the model of large fire case does not fit well a
 And the model of average large fire size result shows lack of some normality from qq-plot.
 
 
-# 4. Regression of wildfires with different cause(natrual or people-caused)
+# 3. Regression of wildfires with different cause(natrual or people-caused)
 
 
 ```{r }
@@ -295,9 +302,9 @@ Avg_SoilMoisture <- summary_peoplecaused$soilmoist1_day_livneh_vic
 Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
 ```
 
-# Regression
 
-## nature variables
+
+## 3.1 Model for cases 
 
 
 ```{r }
@@ -309,11 +316,13 @@ plot(model_npeople)
 model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
 summary(model_nnature)
 plot(model_nnature)
+
+
 ```
 
 
 
-## FIRE_SIZE ~ nature variables
+## 3.2 Model for fire size
 ```{r }
 
 ## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
@@ -324,6 +333,13 @@ model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfa
 
 summary(model_sizepeople)
 plot(model_sizepeople)
+
+```
+
+
+## 3.3 Model for burning area
+
+```{r }
 model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
 summary(model_areanature)
 plot(model_areanature)
