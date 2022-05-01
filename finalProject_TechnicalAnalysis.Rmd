@@ -151,6 +151,9 @@ summary(model1)
 ```{r}
 train$predictions <- predict(model1, newdata = train, "class")
 tab <- table(train$FIRE_SIZE_CLASS, train$predictions)
+tab
+str(train)
+
 round((sum(diag(tab))/sum(tab))*100,2)
 
 cm <- confusionMatrix(train$predictions, train$FIRE_SIZE_CLASS)
@@ -232,6 +235,7 @@ Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
 ## LogTotal ~ nature variables      - NATURE CAUSED (N)
 logitTotalN <- glm(n~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
 summary(logitTotalN)
+plot(logitTotalN)
 ```
 ```{r results='markup'}
 xkabledply(logitTotalN, title = paste("Logistic Regression :", format(formula(logitTotalN)) ))
@@ -242,6 +246,7 @@ xkabledply(logitTotalN, title = paste("Logistic Regression :", format(formula(lo
 ## Logn ~ nature variables        - PEOPLE CAUSED (P)
 logitnP <- glm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
 summary(logitnP)
+plot(logitnP)
 ```
 ```{r results='markup'}
 xkabledply(logitnP, title = paste("Logistic Regression :", format(formula(logitnP)) ))
