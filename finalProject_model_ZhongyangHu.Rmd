@@ -37,4 +37,110 @@ summary(model2)
 plot(model2)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Large fire predictor
+
+You can also embed plots, for example:
+
+```{r  results='markup'}
+library(dplyr)
+data_wildfire=read.csv('final_wildfire.csv')
+data_large=subset(data_wildfire, FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
+temp3=data_large %>% count(Year, DISCOVERY_DOY)
+rainfall <- read.csv("rainfall_daily.csv")
+soilmoisture <- read.csv("soilmoisture_daily.csv")
+airtemp <- read.csv("airtemp_daily.csv")
+airtemp$month <- strftime(airtemp$time, "%m")
+airtemp$year <- strftime(airtemp$time, "%Y")
+airtemp$DOY <- strftime(airtemp$time, "%j")
+rainfall$year <- strftime(rainfall$time, "%Y")
+rainfall$DOY <- strftime(airtemp$time, "%j")
+
+cleaned_rainfall <- subset(rainfall, select = -c(time))
+str(airtemp)
+cleaned_airtemp <- subset(airtemp, select = -c(time))
+soilmoisture$year <- strftime(rainfall$time, "%Y")
+soilmoisture$DOY <- strftime(airtemp$time, "%j")
+
+cleaned_soilmoisture <- subset(soilmoisture, select = -c(time))
+joined1 <- merge(cleaned_airtemp, cleaned_soilmoisture, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
+joined2 <- merge(joined1, cleaned_rainfall, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
+joined2$year=as.integer(joined2$year)
+joined2$DOY=as.integer(joined2$DOY)
+```
+
+```{r }
+str(joined2)
+
+joined2=subset(joined2, year>= 1992 & year<= 2015)
+data_large=merge(joined2,temp3, by.x=c('year','DOY'),by.y=c('Year','DISCOVERY_DOY'),all.x=T)
+data_large$n[is.na(data_large$n)]=0
+data_large$fire=1
+data_large$fire[data_large$n==0]=0
+str(data_large)
+```
+
+
+large fire prediction model, by logit regression
+
+```{r }
+
+model_large=glm(fire~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=data_large,family=binomial())
+summary(model_large)
+
+library('pROC')
+prob=predict(model_large, type = "response" )
+data_large$prob=prob
+h = roc(fire~prob, data=data_large)
+auc(h) 
+plot(h)
+
+library("regclass")
+library("ezids")
+xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large fire predictor" )
+
+
+
+
+```
+
+regression for long term 
+
+
+
+
+
+```{r}
+temp=aggregate(tair_day_livneh_vic~Year+month,data=data_wildfire,mean)
+temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
+joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
+temp1=data_wildfire %>% count(Year, month)
+
+temp2=aggregate(FIRE_SIZE~Year+month,data=data_wildfire,mean)
+joined4 = merge(temp2, temp1, by.x=c('Year', 'month'), by.y=c('Year', 'month'))
+joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'))
+
+
+
+```
+
+```{r results='markup'}
+
+library(corrplot)
+joined4$totalarea=joined4$n*joined4$FIRE_SIZE
+cor_fire=cor(joined4[c(3,4,5,6,7,8)])
+corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
+
+model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_case)
+model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_avgsize)
+
+model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
+summary(model_totalarea)
+
+```
