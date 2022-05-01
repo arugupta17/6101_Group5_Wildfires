@@ -492,10 +492,12 @@ library(tidyverse)
 ```
 
 ```{r pressure, echo=FALSE}
-# Model to predict Fire class using "Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "FIRE_SIZE_CLASS".
+# Model to predict Fire class using "Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "Budget".
 # createDataset
-myvars <- c("Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "FIRE_SIZE_CLASS")
+myvars <- c("Avg_SoilMoisture", "Avg_Temp", "Avg_Rainfall", "STAT_CAUSE_CODE", "FIRE_SIZE_CLASS", "Budget")
 mdb <- final_wildfire[myvars]
+mdb$Budget = as.factor(mdb$Budget)
+
 ```
 
 ```{r pressure, echo=FALSE}
