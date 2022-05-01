@@ -590,7 +590,7 @@ accuracy_tune(tune_fit)
 confusionMatrix(data = predict_unseen, data_test$FIRE_SIZE_CLASS)
 ```
 
-## 4.3 Prediction after tuning model fit.
+## 4.3 predicting fire classes A and B after tuning model fit.
 ```{r pressure, echo=FALSE}
 predict_unseen2 <-predict(tune_fit, data_test, type = 'class')
 ```
