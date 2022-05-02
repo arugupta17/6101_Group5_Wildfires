@@ -352,13 +352,13 @@ model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,d
 #summary(model_avgsize)
 xkabledply(model_avgsize, title = paste("Avg. Size Model Model:",format(formula(model_avgsize)) ))
 plot(model_avgsize)
-plot(model_avgsize)
+VIF(model_avgsize)
 
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_totalarea)
 xkabledply(model_totalarea, title = paste("Burn Area Model:",format(formula(model_totalarea)) ))
 plot(model_totalarea)
-plot(model_totalarea)
+VIF(model_totalarea)
 
 ```
 
