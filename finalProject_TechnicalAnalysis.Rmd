@@ -288,18 +288,21 @@ Then, we take log to those predicted variable. Then the models are improved.
 model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_case)
 xkabledply(model_case, title = paste("Linear Regression :", format(formula(model_case))))
+VIF(model_case)
 plot(model_case)
 
 #Average Fire Size
 model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_avgsize)
 xkabledply(model_avgsize, title = paste("Linear Regression :", format(formula(model_avgsize))))
+VIF(model_avgsize)
 plot(model_avgsize)
 
 #Total Fire Area
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_totalarea)
 xkabledply(model_totalarea, title = paste("Linear Regression :", format(formula(model_totalarea))))
+VIF(model_totalarea)
 plot(model_totalarea)
 
 ```
@@ -344,16 +347,17 @@ model_case=lm(log(n)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4
 #summary(model_case)
 xkabledply(model_case, title = paste("Case Model:",format(formula(model_case)) ))
 plot(model_case)
-
+VIF(model_case)
 model_avgsize=lm(log(FIRE_SIZE)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_avgsize)
 xkabledply(model_avgsize, title = paste("Avg. Size Model Model:",format(formula(model_avgsize)) ))
+plot(model_avgsize)
 plot(model_avgsize)
 
 model_totalarea=lm(log(totalarea)~tair_day_livneh_vic++soilmoist1_day_livneh_vic,data=joined4)
 #summary(model_totalarea)
 xkabledply(model_totalarea, title = paste("Burn Area Model:",format(formula(model_totalarea)) ))
-
+plot(model_totalarea)
 plot(model_totalarea)
 
 ```
@@ -409,7 +413,7 @@ plot(model_npeople)
 ```{r }
 
 ## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
-model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture l, data = summary_nature)
+model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture , data = summary_nature)
 #summary(model_sizenature)
 xkabledply(model_sizenature, title = paste("Nature Caused:",format(formula(model_sizenature)) ))
 plot(model_sizenature)
