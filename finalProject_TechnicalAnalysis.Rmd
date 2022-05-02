@@ -228,61 +228,12 @@ We found that since the large wildfire dataset is not balanced, the model
 fails to predict class since the model strongly predict results as C class, this suppose that we need more data and try alternative model on predict such categroy.
 
 Now, we try to predict the cause of the wildfire based on the conditions of that month
-```{r}
-model2 <- multinom(STAT_CAUSE_CODE ~ month + tair_day_livneh_vic + 
-                     soilmoist1_day_livneh_vic + 
-                     rainfall_day_livneh_vic, data = data_wildfire)
-summary(model2)
-
-```
-
-With  our training data, we achieve an accuracy of 30%. Looking at our
-confusion matrix for this model, is is a bit less biased  towards predicting
-a certain category. This makes sense  because  there does not seem to be one
-predominant cause of the wildfires in our dataset.
-```{r}
-# Predicting the values for train dataset
-train$predictions <- as.factor(predict(model2, newdata = train, "class"))
-
-# Building classification table
-tab <- table(train$STAT_CAUSE_CODE, train$predictions)
-
-# Calculating accuracy - sum of diagonal elements divided by total obs
-round((sum(diag(tab))/sum(tab))*100,2)
-
-cm2 <- confusionMatrix(train$predictions, train$STAT_CAUSE_CODE)
-
-cm2df <- as.data.frame(cm2$table)
-cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
-
-ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
-        geom_tile() + geom_text(aes(label=Freq)) +
-        scale_fill_gradient(low="white", high="#009194") +
-        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes")
-```
-Now, for the test data. We achieve a similar accuracy of 30%
-```{r}
-# Predicting the values for train dataset
-test$predictions <- as.factor(predict(model2, newdata = test, "class"))
-
-# Building classification table
-tab <- table(test$STAT_CAUSE_CODE, test$predictions)
-
-# Calculating accuracy - sum of diagonal elements divided by total obs
-round((sum(diag(tab))/sum(tab))*100,2)
-
-cm2 <- confusionMatrix(test$predictions, test$STAT_CAUSE_CODE)
-
-cm2df <- as.data.frame(cm2$table)
-cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
-
-ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
-        geom_tile() + geom_text(aes(label=Freq)) +
-        scale_fill_gradient(low="white", high="#009194") +
-        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes")
 
 
-```
+With  our training data, the model could not predict class since it predict all of labels to majority of class.  This makes sense  because  there does not seem to be one
+predominant size of the wildfires in our dataset. And we conclude this model is not useable
+
+
 
 
 # 2. regression for long term 
