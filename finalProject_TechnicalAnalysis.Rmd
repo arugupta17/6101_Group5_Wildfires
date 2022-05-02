@@ -569,7 +569,12 @@ confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
 ```
 
 
+## 5 Conclusion
 
+From the previous modeling and plot, we find that the linear model with log transformation generally fit the normality and consistent residuals.
+All of linear model after evaluation are effective.
+
+The classifier we are used to classify fire size
 
 
 
