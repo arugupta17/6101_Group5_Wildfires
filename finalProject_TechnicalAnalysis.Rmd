@@ -227,7 +227,7 @@ ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
 We found that since the large wildfire dataset is not balanced, the model
 fails to predict class since the model strongly predict results as C class, this suppose that we need more data and try alternative model on predict such categroy.
 
-Now, we try to predict the cause of the wildfire based on the conditions of that month
+
 
 
 With  our training data, the model could not predict class since it predict all of labels to majority of class.  This makes sense  because  there does not seem to be one
@@ -439,6 +439,7 @@ plot(model_areapeople)
 
 # 4 Decision Tree model for MultiClass Classification
 
+## 4.1 the basic
 
 
 ```{r  echo=FALSE}
