@@ -19,6 +19,7 @@ R Markdown
 
 ```{r cars}
 library(foreign)
+library(car)
 library(nnet)
 library(ggplot2)
 library(reshape2)
@@ -389,14 +390,14 @@ Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
 ## 3.1 Model for all fire incidents 
 
 ```{r }
-model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture, data = summary_nature)
 #summary(model_nnature)
 xkabledply(model_nnature, title = paste("Nature Caused:",format(formula(model_nnature)) ))
 plot(model_nnature)
 
 
 ## Logn ~ nature variables        - PEOPLE CAUSED (P)
-model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture, data = summary_peoplecaused)
 #summary(model_npeople)
 xkabledply(model_npeople, title = paste("People Caused:",format(formula(model_npeople)) ))
 plot(model_npeople)
@@ -408,13 +409,13 @@ plot(model_npeople)
 ```{r }
 
 ## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
-model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture l, data = summary_nature)
 #summary(model_sizenature)
 xkabledply(model_sizenature, title = paste("Nature Caused:",format(formula(model_sizenature)) ))
 plot(model_sizenature)
 
 
-model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture , data = summary_peoplecaused)
 #summary(model_sizepeople)
 xkabledply(model_sizepeople, title = paste("People Caused:",format(formula(model_sizepeople) )))
 plot(model_sizepeople)
@@ -425,13 +426,13 @@ plot(model_sizepeople)
 ## 3.3 Model for burning area
 
 ```{r }
-model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_nature)
+model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = summary_nature)
 #summary(model_areanature)
 xkabledply(model_areanature, title = paste("Nature Caused:",format(formula(model_areanature)) ))
 plot(model_areanature)
 
 
-model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture + Avg_Rainfall, data = summary_peoplecaused)
+model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = summary_peoplecaused)
 #summary(model_areapeople)
 xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model_areapeople) )))
 plot(model_areapeople)
@@ -574,8 +575,15 @@ confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
 From the previous modeling and plot, we find that the linear model with log transformation generally fit the normality and consistent residuals.
 All of linear model after evaluation are effective.
 
-The classifier we are used to classify fire size
+Those model provide us further details on wildfire cases. By evaluate the model of nature reason and people caused, we find that the model of people caused also explian the large precentage of varation on
+fire cases. This might infer that the environment condition determine how fast wildfire can grow and inducing-difficulty.
 
+The model of size for all kind fire size class and model of size for larger fire have great diffference on variation.
+It suppose that the larger fire size may be determined by other factors more. 
+
+The most of classifiers we are used to classify fire size class are not usable as the data is high unbalanced and number of observations for some categories are limited.
+We could not balance the dataset and build a classifier to solve the problem.
+The logit model trained by labeled data which have a 0/1 value for have C class fire or above from 1992 to 2013 perform well. we select this classifier as the predictor for large fire probability in next day.
 
 
 
