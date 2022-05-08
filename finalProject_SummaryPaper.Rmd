@@ -63,13 +63,11 @@ To answer the second question, we looked at plots of California’s fire suppres
 
 #  3.Large fire predictor
 
-Through EDA, we found that the fire size class in California has a very high frequency in A and B fire class size.
-Those sizes of wildfires may not be a threats to environment and properties since they could disappear soon.
-The size of C class and above could be dangerous as the burned size grows fast.
+Through EDA, we found that the fire size class in California has a very high frequency in A and B fire class size. From the dataset, we can find that wildfires in class A and B sizes are observed every day, and those kinds of wildfires are self-limiting and are expected to disappear soon.  As previously mentioned, other kinds of wildfires fall under fire class size C or higher. Those kinds of wildfires are not typically observed frequently and could burn over a larger area. Such wildfires are a threat to the environment, wildlife, and people living in the area. The size C fire class and above are thus, considered dangerous as the burned size grows fast. So, this research focuses on the analysis of larger fires.  The class of fire with C or above appears in 4410 days in California from 1992 to 2015. We are trying to make a model that predicts the chances of getting a wildfire by given average temperature, soil moisture, and rainfall by building a logit regression model. 
 
 
-Data are labeled with large fire or not from 1992 to 2015, each data have 3 features as daily temperature
-soil moisture and rainfall in average of California.
+In the dataset, we labeled the days of no observation with 0 and days of at least 1 observation with 1. During training, we try several configurations on input features. It is found that the model with temperature, soil moisture, and rainfall cannot be improved with temperature and soil moisture included in the model. The model with temperature and soil moisture achieved the AUC score of 0.9017. Even though the results are high enough to predict the chances, we need to forecast the situation; this model needs the simultaneous data of input features to predict wildfire; it could be more convenient to use the model with the daily data to predict if there will be any fires the next day.  In order to increase the useability of this model, we adjust the model to predict the wildfires in the next day by merging the observations of the previous day’s environmental data. We then trained the logit model with this adjusted data set, and the model with parameters of soil moisture and temperature get an AUC of 0.9002. This AUC score is close to the model with same-day data. Next, we simplify the model by reducing the feature required in prediction. We find the model with temperature input has an AUC of 0.8799. This model is still useful for predicting wildfires the next day with fewer data points. To be specific, in the confusion matrix, the model with temperature and soil moisture input has  689 types 2 errors out of 8036 total days, and the model with only temperature input has 780 type 2 errors.
+
 
 ```{r  results='markup'}
 library(dplyr)
@@ -401,8 +399,9 @@ By the plot check we found that the model of large fire case does not fit well a
 And the model of average large fire size result shows lack of some normality from qq-plot.
 
 
-## 4.3. Regression of wildfires with different cause(natrual or people-caused
+## 4.3. Regression of wildfires with different cause(natrual or people-caused)
 
+First, linear modeling was used to predict the total number of fires in California, the fire size, and the burn area with respect to the environmental factors as the independent variables. These models were also looked at individually for naturally caused wildfires and those caused by people to see if there is a difference in the wildfire's impact. 
 
 ```{r }
 summary_nature=read.csv('summary_nature.csv')
@@ -424,6 +423,7 @@ Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
 
 
 ## 3.1 Model for all fire incidents 
+The first model with the total number of fires as the dependent variable had an adjusted R-squared value of `r format(model_nnature$r.squared *100)`%. This means that the environmental factors can explain 87% of the total variation in the number of fires when the fires were naturally caused. The R-squared value was `r format(model_npeople$r.squared *100)`% for the model where the fires were man-made. The coefficients of the independent variables showed that, for both the models, there was a direct relationship between the air temperature and the number of fires and the soil moisture and the number of fires. There was an indirect relationship between rainfall and the number of fires.
 
 ```{r }
 model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture, data = summary_nature)
@@ -442,6 +442,9 @@ plot(model_npeople)
 
 
 ## 3.2 Model for fire size
+
+Next, we modeled the environmental factors and their impact on the fire size. The environmental factors can explain `r format(model_sizenature$r.squared *100)`% of the variation in the fire size in the naturally caused fires model, whereas only `r format(model_sizepeople$r.squared *100)`% of the variation could be explained by those factors in the people caused fires model. The relationship of the independent variables was the same with the fire size as it was with the number of fires. 
+
 ```{r }
 
 ## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
@@ -461,6 +464,8 @@ plot(model_sizepeople)
 
 ## 3.3 Model for burning area
 
+Finally, we looked at the burn area and how environmental factors impact it. We found that `r format(model_areanature$r.squared *100)`% of the variation in burn size was explained in the naturally caused fires model, and `r format(model_areapeople$r.squared *100)`% was explained in the people caused fires model. Again, the relationship between the variables stayed consistent with previous models.  
+
 ```{r }
 model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = summary_nature)
 #summary(model_areanature)
@@ -473,6 +478,9 @@ model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = s
 xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model_areapeople) )))
 plot(model_areapeople)
 ```
+
+When looking at the difference in the impact of the fires based on their cause, the linear models showed that regardless of if the wildfire was started naturally or was manmade, since the relationship between the variables remained consistent, the impact of both kinds of wildfires was equally as devastating. 
+
 
 # 4 Decision Tree model for MultiClass Classification
 
