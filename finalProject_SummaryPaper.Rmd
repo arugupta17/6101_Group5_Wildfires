@@ -21,6 +21,15 @@ library(ggplot2)
 ```
 
 # 1. Introduction
+In recent years, California has seen record-breaking numbers of wildfires. The wildfires impact
+wildlife and residents and also have serious environmental implications. These outcomes result
+from heightened CO2 levels, temperatures, and precipitation. Previous exploratory analysis has shown that lower soil moisture and rainfall led to larger fires between 1992 to 2015, while lower soil moisture and rain led to more wildfires caused by equipment use. It was also found that higher rainfall resulted in a higher chance that a wildfire was caused by lightning. Government spending seemed to have a marginal impact on suppressing wildfires in California.
+
+With climate change being an increasingly relevant issue these days, this research studies how wildfires in California have changed over time. Specifically, we focused on wildfires from 1992 to 2013 and sought to investigate factors that may have contributed to a significant impact on the intensity or volume of wildfires in California over the years. 
+
+The first dataset we found detailed 24 years' worth of nationwide wildfires from 1992 to 2015 along with their associated sizes, causes, time of occurrence, and other metadata. We felt that analyzing every state’s wildfire patterns would be an unfocused and unfruitful effort, so we decided to focus on California, as it deals with the most wildfires compared to other states in the United States.
+
+However, we needed more data to conduct a more in-depth analysis, so we retrieved data from Cal-Adapt, which is an effort developed by the Geospatial Innovation Facility at the University of California, Berkeley  focused on providing  data that portrays climate change in California.  From here, we were able to collect data about California’s daily air temperature, soil moisture, and rainfall. From there, we were able to combine it with our wildfire data by aggregating monthly averages. We also added California’s yearly budget to our combined dataset because we were curious as to how it played a factor in the volume and intensity of wildfires over the years.
 
 
 
