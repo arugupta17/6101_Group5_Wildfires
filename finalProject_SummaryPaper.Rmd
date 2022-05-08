@@ -356,15 +356,12 @@ predominant size of the wildfires in our dataset. And we conclude this model is 
 
 
 
-# 5. The wildfire cases in long term
-
-We also wanted to evaluate the long term effect on the wildfires by nature factors.
-We tried to predict the cases of wildfires, average fire size and total burned fire by nature factors.
-
 
 
 ## 5.1 predictions of Wildfire Cases, fire size and burning area 
 
+We also wanted to evaluate the long term effect on the wildfires by nature factors.
+We tried to predict the cases of wildfires, average fire size and total burned fire by nature factors.
 
 ```{r}
 temp=aggregate(tair_day_livneh_vic~Year+month,data=data_wildfire,mean)
@@ -452,7 +449,7 @@ joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'
 
 ```
 
-## 5.3 The long-term large wildfire Prediction and Analysis
+## 5.2 The long-term large wildfire Prediction and Analysis
 
 We build models to predict the large wildfire number firesize and total burned area.
 ```{r results='markup'}
