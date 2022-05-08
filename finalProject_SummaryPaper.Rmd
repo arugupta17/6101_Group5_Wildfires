@@ -67,7 +67,7 @@ We studied the frequency of different fire class sizes to answer the second ques
 To answer the second question, we looked at plots of California’s fire suppression budget and wildfire count over the years to see if there was anything noteworthy. Below, we can see that there is no strong relationship between the money spent controlling wildfires and the number of wildfires that occur each year. 
 
 
-## 4.3. Regression of wildfires with different cause(natrual or people-caused)
+# 3. Linear Regression of wildfires with different cause(natrual or people-caused)
 
 First, linear modeling was used to predict the total number of fires in California, the fire size, and the burn area with respect to the environmental factors as the independent variables. These models were also looked at individually for naturally caused wildfires and those caused by people to see if there is a difference in the wildfire's impact. 
 
@@ -151,13 +151,7 @@ Finally, we looked at the burn area and how environmental factors impact it. We 
 When looking at the difference in the impact of the fires based on their cause, the linear models showed that regardless of if the wildfire was started naturally or was manmade, since the relationship between the variables remained consistent, the impact of both kinds of wildfires was equally as devastating. 
 
 
-
-
-
-
-
-
-#  3.Large fire predictor
+# 4.Large fire predictor
 
 Through EDA, we found that the fire size class in California has a very high frequency in A and B fire class size. From the dataset, we can find that wildfires in class A and B sizes are observed every day, and those kinds of wildfires are self-limiting and are expected to disappear soon.  As previously mentioned, other kinds of wildfires fall under fire class size C or higher. Those kinds of wildfires are not typically observed frequently and could burn over a larger area. Such wildfires are a threat to the environment, wildlife, and people living in the area. The size C fire class and above are thus, considered dangerous as the burned size grows fast. So, this research focuses on the analysis of larger fires.  The class of fire with C or above appears in 4410 days in California from 1992 to 2015. We are trying to make a model that predicts the chances of getting a wildfire by given average temperature, soil moisture, and rainfall by building a logit regression model. 
 
@@ -220,7 +214,7 @@ str(data_large2)
 ```
 
 
-## 3.1 Large fire prediction model, by logit regression
+## 4.1 Large fire prediction model, by logit regression
 
 
 ```{r results='markup' }
@@ -296,7 +290,7 @@ The results suppose that with temperature rainfall and soil moisture data from t
 If we try to make a convenient model that require only temperature to predict the probability,
 the AUC is 0.88.
 
-## 3.2 Multinomial Regression Models
+# 5. Multinomial Regression Models
 
 we are try to figure out that can we predict the specific fire size
 of a large wildfire(class c or above)
@@ -362,14 +356,14 @@ predominant size of the wildfires in our dataset. And we conclude this model is 
 
 
 
-# 4. The wildfire cases in long term
+# 5. The wildfire cases in long term
 
 We also wanted to evaluate the long term effect on the wildfires by nature factors.
 We tried to predict the cases of wildfires, average fire size and total burned fire by nature factors.
 
 
 
-## 4.1 predictions of Wildfire Cases, fire size and burning area 
+## 5.1 predictions of Wildfire Cases, fire size and burning area 
 
 
 ```{r}
@@ -458,7 +452,7 @@ joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'
 
 ```
 
-## 4.2 The long-term large wildfire Prediction and Analysis
+## 5.3 The long-term large wildfire Prediction and Analysis
 
 We build models to predict the large wildfire number firesize and total burned area.
 ```{r results='markup'}
@@ -494,9 +488,9 @@ By the plot check we found that the model of large fire case does not fit well a
 And the model of average large fire size result shows lack of some normality from qq-plot.
 
 
-# 4 Decision Tree model for MultiClass Classification
+# 6 Decision Tree model for MultiClass Classification
 
-## 4.1 predicting all fire classes.
+## 6.1 predicting all fire classes.
 
 
 ```{r  echo=FALSE}
@@ -565,7 +559,7 @@ pred_y = predict(model, data_test)
 
 
 
-## 4.2 predicting only fire classes A and B using Decision Tree.
+## 6.2 predicting only fire classes A and B using Decision Tree.
 
 ```{r  echo=FALSE}
 fit <- rpart(FIRE_SIZE_CLASS~., data = data_train, method = 'class')
@@ -611,7 +605,7 @@ accuracy_tune(tune_fit)
 confusionMatrix(data = predict_unseen, data_test$FIRE_SIZE_CLASS)
 ```
 
-## 4.3 predicting fire classes A and B after tuning model fit.
+## 6.3 predicting fire classes A and B after tuning model fit.
 ```{r  echo=FALSE}
 predict_unseen2 <-predict(tune_fit, data_test, type = 'class')
 ```
@@ -625,12 +619,12 @@ confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
 ```
 
 
-# 5. Conclusion:
+# 7. Conclusion:
 
 Through basic exploratory data analysis and modeling, this research concluded a strong relationship between the environmental factors and the wildfires, its burn area and the fire size. The linear modeling helps to show that regardless of the caus of the fire, its impact remains equally as devastating. 
  
 
-# 6. Limitations and Future Research: 
+# 8. Limitations and Future Research: 
 
 
 The raw data on the environmental factors were recorded at a daily frequency. To conduct the research, the frequency was converted into monthly and yearly. To make a more accurate prediction about the wildfire, it would have been beneficial to look at the exact data for temperature, soil moisture, and rainfall data for the wildfire instead of a monthly or yearly average. In addition, our wildfire data only went up to 2015; it would have been useful to see how frequent and intense fires from the past 7 years have been, especially with the acceleration  of global temperatures. 
