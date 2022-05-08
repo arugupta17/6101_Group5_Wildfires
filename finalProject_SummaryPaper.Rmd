@@ -48,7 +48,7 @@ However, we needed more data to conduct a more in-depth analysis, so we retrieve
 
 The initial exploratory data analysis made it clear that most fires in California were correlated with high average air temperatures, low soil moisture, and periods of low rainfall. To predict factors that may cause future wildfires, the following questions need to be addressed:
 
-* 1. How strong is the relationship between California fires and the average rainfall, air temperature, and soil moisture? 
+* How strong is the relationship between California fires and the average rainfall, air temperature, and soil moisture? 
 * Does California’s yearly fire suppression budget play any role in mitigating wildfires?
 * How strongly can we predict large(class) wildfires using rainfall, air temperature, and soil moisture data? 
 * How can the long-term wildfires be predicted based on the month’s temperature, soil moisture, and rainfall with reasonable accuracy?
@@ -57,7 +57,7 @@ To answer the first question, we used a correlation matrix to study the impact o
 
 
 
-
+***** Insert the correlation matrix here ********
 
 
 
@@ -65,6 +65,8 @@ To answer the first question, we used a correlation matrix to study the impact o
 We studied the frequency of different fire class sizes to answer the second question. It was observed that the fire size class in California has a high frequency of class A and B fire sizes. These fire class sizes of wildfires are not considered a threat to the environment and nearby properties since they typically disappear soon. The fire class size C and higher could be dangerous as the burn size grows fast in such fire cases.  
 
 To answer the second question, we looked at plots of California’s fire suppression budget and wildfire count over the years to see if there was anything noteworthy. Below, we can see that there is no strong relationship between the money spent controlling wildfires and the number of wildfires that occur each year. 
+
+***********Insert images here************
 
 
 # 3. Linear Regression of wildfires with different cause(natrual or people-caused)
