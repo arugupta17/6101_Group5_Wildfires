@@ -15,7 +15,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE)
 library('ezids')
 ```
 
@@ -57,9 +57,62 @@ To answer the first question, we used a correlation matrix to study the impact o
 
 
 
-***** Insert the correlation matrix here ********
+```{r  }
+library(dplyr)
+data_wildfire=read.csv('final_wildfire.csv')
+data_large=subset(data_wildfire, FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
+temp3=data_large %>% count(Year, DISCOVERY_DOY)
+rainfall <- read.csv("rainfall_daily.csv")
+soilmoisture <- read.csv("soilmoisture_daily.csv")
+airtemp <- read.csv("airtemp_daily.csv")
+airtemp$month <- strftime(airtemp$time, "%m")
+airtemp$year <- strftime(airtemp$time, "%Y")
+airtemp$DOY <- strftime(airtemp$time, "%j")
+rainfall$year <- strftime(rainfall$time, "%Y")
+rainfall$DOY <- strftime(airtemp$time, "%j")
+
+cleaned_rainfall <- subset(rainfall, select = -c(time))
+str(airtemp)
+cleaned_airtemp <- subset(airtemp, select = -c(time))
+soilmoisture$year <- strftime(rainfall$time, "%Y")
+soilmoisture$DOY <- strftime(airtemp$time, "%j")
+
+cleaned_soilmoisture <- subset(soilmoisture, select = -c(time))
+joined1 <- merge(cleaned_airtemp, cleaned_soilmoisture, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
+joined2 <- merge(joined1, cleaned_rainfall, by.x=c("year",'DOY'), by.y=c("year",'DOY'))
+joined2$year=as.integer(joined2$year)
+joined2$DOY=as.integer(joined2$DOY)
+```
+
+```{r}
+temp=aggregate(tair_day_livneh_vic~Year+month,data=data_wildfire,mean)
+temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=data_wildfire,mean)
+
+joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
+joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
+temp1=data_wildfire %>% count(Year, month)
+
+temp2=aggregate(FIRE_SIZE~Year+month,data=data_wildfire,mean)
+joined4 = merge(temp2, temp1, by.x=c('Year', 'month'), by.y=c('Year', 'month'))
+joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'))
 
 
+
+```
+
+```{r results='markup'}
+
+library(corrplot)
+joined4$totalarea=joined4$n*joined4$FIRE_SIZE
+cordata=joined4
+colnames(cordata)[3]='AvgTemp'
+colnames(cordata)[4]='AvgSoilMoisture'
+colnames(cordata)[5]='AvgRainfall'
+cor_fire=cor(cordata[c(3,4,5,6,7,8)])
+corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
+```
 
 
 We studied the frequency of different fire class sizes to answer the second question. It was observed that the fire size class in California has a high frequency of class A and B fire sizes. These fire class sizes of wildfires are not considered a threat to the environment and nearby properties since they typically disappear soon. The fire class size C and higher could be dangerous as the burn size grows fast in such fire cases.  
@@ -158,8 +211,7 @@ When looking at the difference in the impact of the fires based on their cause, 
 Through EDA, we found that the fire size class in California has a very high frequency in A and B fire class size. From the dataset, we can find that wildfires in class A and B sizes are observed every day, and those kinds of wildfires are self-limiting and are expected to disappear soon.  As previously mentioned, other kinds of wildfires fall under fire class size C or higher. Those kinds of wildfires are not typically observed frequently and could burn over a larger area. Such wildfires are a threat to the environment, wildlife, and people living in the area. The size C fire class and above are thus, considered dangerous as the burned size grows fast. So, this research focuses on the analysis of larger fires.  The class of fire with C or above appears in 4410 days in California from 1992 to 2015. We are trying to make a model that predicts the chances of getting a wildfire by given average temperature, soil moisture, and rainfall by building a logit regression model. 
 
 
-In the dataset, we labeled the days of no observation with 0 and days of at least 1 observation with 1. During training, we try several configurations on input features. It is found that the model with temperature, soil moisture, and rainfall cannot be improved with temperature and soil moisture included in the model. The model with temperature and soil moisture achieved the AUC score of 0.9017. Even though the results are high enough to predict the chances, we need to forecast the situation; this model needs the simultaneous data of input features to predict wildfire; it could be more convenient to use the model with the daily data to predict if there will be any fires the next day.  In order to increase the useability of this model, we adjust the model to predict the wildfires in the next day by merging the observations of the previous day’s environmental data. We then trained the logit model with this adjusted data set, and the model with parameters of soil moisture and temperature get an AUC of 0.9002. This AUC score is close to the model with same-day data. Next, we simplify the model by reducing the feature required in prediction. We find the model with temperature input has an AUC of 0.8799. This model is still useful for predicting wildfires the next day with fewer data points. To be specific, in the confusion matrix, the model with temperature and soil moisture input has  689 types 2 errors out of 8036 total days, and the model with only temperature input has 780 type 2 errors.
-
+In the dataset, we labeled the days of no observation with 0 and days of at least 1 observation with 1. During training, we try several configurations on input features. It is found that the model with temperature, soil moisture, and rainfall cannot be improved with temperature and soil moisture included in the model.
 
 ```{r  results='markup'}
 library(dplyr)
@@ -239,8 +291,8 @@ xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large f
 
 
 ```
+ The model with temperature and soil moisture achieved the AUC score of 0.9017. Even though the results are high enough to predict the chances, we need to forecast the situation; this model needs the simultaneous data of input features to predict wildfire; it could be more convenient to use the model with the daily data to predict if there will be any fires the next day.  In order to increase the useability of this model, we adjust the model to predict the wildfires in the next day by merging the observations of the previous day’s environmental data. We then trained the logit model with this adjusted data set.
 
-To try to increase usability for the model, we try to make a model to predict the probability in next day:
 
 
 
@@ -288,11 +340,9 @@ xkabledply( confusion_matrix(model_large), title = "Confusion matrix for large f
 
 
 ```
-The results suppose that with temperature rainfall and soil moisture data from today; We have AUC 0.9 for predicting the the large fire in next day
-If we try to make a convenient model that require only temperature to predict the probability,
-the AUC is 0.88.
+and the model with parameters of soil moisture and temperature get an AUC of 0.9002. This AUC score is close to the model with same-day data. Next, we simplify the model by reducing the feature required in prediction. We find the model with temperature input has an AUC of 0.8799. This model is still useful for predicting wildfires the next day with fewer data points. To be specific, in the confusion matrix, the model with temperature and soil moisture input has  689 types 2 errors out of 8036 total days, and the model with only temperature input has 780 type 2 errors. It suppose that the model can predict next day situation with no significant AUC difference. 
 
-# 5. Multinomial Regression Models
+## 4.2 Multinomial Regression Models
 
 we are try to figure out that can we predict the specific fire size
 of a large wildfire(class c or above)
@@ -357,7 +407,7 @@ predominant size of the wildfires in our dataset. And we conclude this model is 
 
 
 
-
+# 5 Long term estimation of wildfire cases, fire size and burning area
 
 
 ## 5.1 predictions of Wildfire Cases, fire size and burning area 
@@ -365,33 +415,9 @@ predominant size of the wildfires in our dataset. And we conclude this model is 
 We also wanted to evaluate the long term effect on the wildfires by nature factors.
 We tried to predict the cases of wildfires, average fire size and total burned fire by nature factors.
 
-```{r}
-temp=aggregate(tair_day_livneh_vic~Year+month,data=data_wildfire,mean)
-temp1=aggregate(soilmoist1_day_livneh_vic~Year+month,data=data_wildfire,mean)
-
-temp2=aggregate(rainfall_day_livneh_vic~Year+month,data=data_wildfire,mean)
-
-joined3=merge(temp,temp1,by.x=c('Year','month'),by.y=c('Year','month'))
-joined3=merge(joined3,temp2,by.x=c('Year','month'),by.y=c('Year','month'))
-temp1=data_wildfire %>% count(Year, month)
-
-temp2=aggregate(FIRE_SIZE~Year+month,data=data_wildfire,mean)
-joined4 = merge(temp2, temp1, by.x=c('Year', 'month'), by.y=c('Year', 'month'))
-joined4 = merge(joined3, joined4, by.x=c('Year','month'), by.y=c('Year', 'month'))
 
 
-
-```
-
-```{r results='markup'}
-
-library(corrplot)
-joined4$totalarea=joined4$n*joined4$FIRE_SIZE
-cor_fire=cor(joined4[c(3,4,5,6,7,8)])
-corrplot(cor_fire,method='number',type = 'lower', diag = TRUE)
-```
-
-From the corrplot, we can find that the number of case have strong correlation with environment variable.
+From the corrplot in EDA part, we can find that the number of case have strong correlation with environment variable.
 And the fire size, total area burned have some correlation with environment variable.
 We try to use linear model for those predicted variable, the result suppose that the model is not fit well.
 Then, we take log to those predicted variable. Then the models are improved.
@@ -622,12 +648,16 @@ We noticed an increase in the accuracy of this model in the above confusion matr
 Through basic exploratory data analysis and modeling, this research concluded a strong relationship between the environmental factors and the wildfires, its burn area and the fire size. The linear modeling helps to show that regardless of the caus of the fire, its impact remains equally as devastating. 
  
 
-# 8. Limitations and Future Research: 
+# 8. Limitations of models and Future Research: 
 
 
 The raw data on the environmental factors were recorded at a daily frequency. To conduct the research, the frequency was converted into monthly and yearly. To make a more accurate prediction about the wildfire, it would have been beneficial to look at the exact data for temperature, soil moisture, and rainfall data for the wildfire instead of a monthly or yearly average. In addition, our wildfire data only went up to 2015; it would have been useful to see how frequent and intense fires from the past 7 years have been, especially with the acceleration  of global temperatures. 
+ 
+The data we used is for the average whole California, it could not provide the variation of environment data with different latitude and longitude. Also, the model estimates the prediction for the whole california; it is not the average per specific size. The model could noe be applied with smaller region of California. 
 
-Through our EDA and modeling, we saw that we were dealing with incredibly imbalanced data, in that most of the fires recorded by the FPA (Fire Program Analysis) System fell into only  a couple different categories. In particular, 48% of fires were caused by 3 main causes (debris burning, lightning, and miscellaneous reasons) out of 13 causes found in  the dataset. In addition, just over 90% of wildfires fell into class A and B, which means that a vast majority of recorded fires were between 0 to 9.9 acres. We either need to collect more data on larger class fires or balance our data so that our models can more accurately predict wildfire causes and sizes.
+Through our EDA and modeling, we saw that we were dealing with incredibly imbalanced data, in that most of the fires recorded by the FPA (Fire Program Analysis) System fell into only  a couple different categories. In particular, 48% of fires were caused by 3 main causes (debris burning, lightning, and miscellaneous reasons) out of 13 causes found in  the dataset. In addition, just over 90% of wildfires fell into class A and B, which means that a vast majority of recorded fires were between 0 to 9.9 acres. The classifier we trained are sensitive with the dataset balance; since most of fire cases are in size class A and B, models consistent give the
+prediction in A or B can maximize the accuracy. Those models cannot be applied in prediction. In the preprocessing for the large fire predictor, we reduce the complexity of the prediction situation, and the logit models
+trained from such dataset achieve a usable score with AUC around 0.9. We either need to collect more data categories for inputing into model and balance our data so that our models can more accurately predict wildfire causes and sizes.
 
 In the future, it would also be interesting to take a deeper look into Class C fires and study the factors that cause larger fires and how it impacts the burn time of these larger fires. Lastly, we would be curious to see how the analytical and prediction techniques used to study the wildfires in California work for different states like Colorado and even the wildfires in Australia.
 
