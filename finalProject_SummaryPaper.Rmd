@@ -32,8 +32,23 @@ The first dataset we found detailed 24 years' worth of nationwide wildfires from
 However, we needed more data to conduct a more in-depth analysis, so we retrieved data from Cal-Adapt, which is an effort developed by the Geospatial Innovation Facility at the University of California, Berkeley  focused on providing  data that portrays climate change in California.  From here, we were able to collect data about California’s daily air temperature, soil moisture, and rainfall. From there, we were able to combine it with our wildfire data by aggregating monthly averages. We also added California’s yearly budget to our combined dataset because we were curious as to how it played a factor in the volume and intensity of wildfires over the years.
 
 
-
 # 2. Basic EDA of wildfires in California
+
+The initial exploratory data analysis made it clear that most fires in California were correlated with high average air temperatures, low soil moisture, and periods of low rainfall. To predict factors that may cause future wildfires, the following questions need to be addressed:
+
+* 1. How strong is the relationship between California fires and the average rainfall, air temperature, and soil moisture? 
+* Does California’s yearly fire suppression budget play any role in mitigating wildfires?
+* How strongly can we predict large(class) wildfires using rainfall, air temperature, and soil moisture data? 
+* How can the long-term wildfires be predicted based on the month’s temperature, soil moisture, and rainfall with reasonable accuracy?
+
+To answer the first question, we used a correlation matrix to study the impact of temperature, soil moisture, and rainfall on the fire size. The correlation matrix showed a weak positive correlation between average air temperature and the fire size, whereas there was a strong negative correlation between fire size and soil moisture and fire size and rainfall. 
+
+
+
+
+
+
+
 
 
 
