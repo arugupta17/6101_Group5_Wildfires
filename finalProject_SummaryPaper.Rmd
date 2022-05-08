@@ -613,5 +613,23 @@ confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
 ```
 
 
-## 5 Summary
+# 5. Conclusion:
+
+Through basic exploratory data analysis and modeling, this research concluded a strong relationship between the environmental factors and the wildfires, its burn area and the fire size. The linear modeling helps to show that regardless of the caus of the fire, its impact remains equally as devastating. 
+ 
+
+# 6. Limitations and Future Research: 
+
+
+The raw data on the environmental factors were recorded at a daily frequency. To conduct the research, the frequency was converted into monthly and yearly. To make a more accurate prediction about the wildfire, it would have been beneficial to look at the exact data for temperature, soil moisture, and rainfall data for the wildfire instead of a monthly or yearly average. In addition, our wildfire data only went up to 2015; it would have been useful to see how frequent and intense fires from the past 7 years have been, especially with the acceleration  of global temperatures. 
+
+Through our EDA and modeling, we saw that we were dealing with incredibly imbalanced data, in that most of the fires recorded by the FPA (Fire Program Analysis) System fell into only  a couple different categories. In particular, 48% of fires were caused by 3 main causes (debris burning, lightning, and miscellaneous reasons) out of 13 causes found in  the dataset. In addition, just over 90% of wildfires fell into class A and B, which means that a vast majority of recorded fires were between 0 to 9.9 acres. We either need to collect more data on larger class fires or balance our data so that our models can more accurately predict wildfire causes and sizes.
+
+In the future, it would also be interesting to take a deeper look into Class C fires and study the factors that cause larger fires and how it impacts the burn time of these larger fires. Lastly, we would be curious to see how the analytical and prediction techniques used to study the wildfires in California work for different states like Colorado and even the wildfires in Australia.
+
+California’s fire suppression data was also not granular enough in that it did not detail where exactly the money was going. For the years that we could compare fire frequency to the budget, it did not look like the budget had any direct effect on the wildfires in California. As a result, we would recommend the State of California look into how the money is being spent. In addition, we believe that more specific data on how the budget is being spent will help with optimizing allocation to different efforts appropriately. 
+
+# 7. References: 
+                 
+
 
