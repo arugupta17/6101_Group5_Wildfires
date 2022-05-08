@@ -635,7 +635,7 @@ In the future, it would also be interesting to take a deeper look into Class C f
 
 California’s fire suppression data was also not granular enough in that it did not detail where exactly the money was going. For the years that we could compare fire frequency to the budget, it did not look like the budget had any direct effect on the wildfires in California. As a result, we would recommend the State of California look into how the money is being spent. In addition, we believe that more specific data on how the budget is being spent will help with optimizing allocation to different efforts appropriately. 
 
-# 7. References: 
+# 9. References: 
                  
 
 
