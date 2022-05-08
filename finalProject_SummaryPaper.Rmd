@@ -50,6 +50,13 @@ To answer the first question, we used a correlation matrix to study the impact o
 
 
 
+We studied the frequency of different fire class sizes to answer the second question. It was observed that the fire size class in California has a high frequency of class A and B fire sizes. These fire class sizes of wildfires are not considered a threat to the environment and nearby properties since they typically disappear soon. The fire class size C and higher could be dangerous as the burn size grows fast in such fire cases.  
+
+To answer the second question, we looked at plots of California’s fire suppression budget and wildfire count over the years to see if there was anything noteworthy. Below, we can see that there is no strong relationship between the money spent controlling wildfires and the number of wildfires that occur each year. 
+
+
+
+
 
 
 
