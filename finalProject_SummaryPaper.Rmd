@@ -67,6 +67,90 @@ We studied the frequency of different fire class sizes to answer the second ques
 To answer the second question, we looked at plots of California’s fire suppression budget and wildfire count over the years to see if there was anything noteworthy. Below, we can see that there is no strong relationship between the money spent controlling wildfires and the number of wildfires that occur each year. 
 
 
+## 4.3. Regression of wildfires with different cause(natrual or people-caused)
+
+First, linear modeling was used to predict the total number of fires in California, the fire size, and the burn area with respect to the environmental factors as the independent variables. These models were also looked at individually for naturally caused wildfires and those caused by people to see if there is a difference in the wildfire's impact. 
+
+```{r }
+summary_nature=read.csv('summary_nature.csv')
+summary_peoplecaused=read.csv('summary_peoplecaused.csv')
+```
+
+```{r}
+#Renaming variables in summary_nature
+Avg_Temp <- summary_nature$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_nature$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_nature$rainfall_day_livneh_vic
+
+#Renaming variables in summary_peoplecaused
+Avg_Temp <- summary_peoplecaused$tair_day_livneh_vic
+Avg_SoilMoisture <- summary_peoplecaused$soilmoist1_day_livneh_vic
+Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
+```
+
+
+
+## 3.1 Model for all fire incidents 
+
+```{r }
+model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture, data = summary_nature)
+#summary(model_nnature)
+xkabledply(model_nnature, title = paste("Nature Caused:",format(formula(model_nnature)) ))
+plot(model_nnature)
+
+
+## Logn ~ nature variables        - PEOPLE CAUSED (P)
+model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture, data = summary_peoplecaused)
+#summary(model_npeople)
+xkabledply(model_npeople, title = paste("People Caused:",format(formula(model_npeople)) ))
+plot(model_npeople)
+```
+
+The first model with the total number of fires as the dependent variable had an adjusted R-squared value of `r format(model_nnature$r.squared *100)`%. This means that the environmental factors can explain 87% of the total variation in the number of fires when the fires were naturally caused. The R-squared value was `r format(model_npeople$r.squared *100)`% for the model where the fires were man-made. The coefficients of the independent variables showed that, for both the models, there was a direct relationship between the air temperature and the number of fires and the soil moisture and the number of fires. There was an indirect relationship between rainfall and the number of fires.
+
+## 3.2 Model for fire size
+
+```{r }
+
+## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
+model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture , data = summary_nature)
+#summary(model_sizenature)
+xkabledply(model_sizenature, title = paste("Nature Caused:",format(formula(model_sizenature)) ))
+plot(model_sizenature)
+
+
+model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture , data = summary_peoplecaused)
+#summary(model_sizepeople)
+xkabledply(model_sizepeople, title = paste("People Caused:",format(formula(model_sizepeople) )))
+plot(model_sizepeople)
+
+```
+
+Next, we modeled the environmental factors and their impact on the fire size. The environmental factors can explain `r format(model_sizenature$r.squared *100)`% of the variation in the fire size in the naturally caused fires model, whereas only `r format(model_sizepeople$r.squared *100)`% of the variation could be explained by those factors in the people caused fires model. The relationship of the independent variables was the same with the fire size as it was with the number of fires. 
+
+
+## 3.3 Model for burning area
+
+
+```{r }
+model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = summary_nature)
+#summary(model_areanature)
+xkabledply(model_areanature, title = paste("Nature Caused:",format(formula(model_areanature)) ))
+plot(model_areanature)
+
+
+model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = summary_peoplecaused)
+#summary(model_areapeople)
+xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model_areapeople) )))
+plot(model_areapeople)
+```
+
+Finally, we looked at the burn area and how environmental factors impact it. We found that `r format(model_areanature$r.squared *100)`% of the variation in burn size was explained in the naturally caused fires model, and `r format(model_areapeople$r.squared *100)`% was explained in the people caused fires model. Again, the relationship between the variables stayed consistent with previous models.  
+
+
+When looking at the difference in the impact of the fires based on their cause, the linear models showed that regardless of if the wildfire was started naturally or was manmade, since the relationship between the variables remained consistent, the impact of both kinds of wildfires was equally as devastating. 
+
+
 
 
 
@@ -408,90 +492,6 @@ model of average fire size 0.3366
 model of average total burned size with 0.7391
 By the plot check we found that the model of large fire case does not fit well as the residual is not consistent.
 And the model of average large fire size result shows lack of some normality from qq-plot.
-
-
-## 4.3. Regression of wildfires with different cause(natrual or people-caused)
-
-First, linear modeling was used to predict the total number of fires in California, the fire size, and the burn area with respect to the environmental factors as the independent variables. These models were also looked at individually for naturally caused wildfires and those caused by people to see if there is a difference in the wildfire's impact. 
-
-```{r }
-summary_nature=read.csv('summary_nature.csv')
-summary_peoplecaused=read.csv('summary_peoplecaused.csv')
-```
-
-```{r}
-#Renaming variables in summary_nature
-Avg_Temp <- summary_nature$tair_day_livneh_vic
-Avg_SoilMoisture <- summary_nature$soilmoist1_day_livneh_vic
-Avg_Rainfall <- summary_nature$rainfall_day_livneh_vic
-
-#Renaming variables in summary_peoplecaused
-Avg_Temp <- summary_peoplecaused$tair_day_livneh_vic
-Avg_SoilMoisture <- summary_peoplecaused$soilmoist1_day_livneh_vic
-Avg_Rainfall <- summary_peoplecaused$rainfall_day_livneh_vic
-```
-
-
-
-## 3.1 Model for all fire incidents 
-
-```{r }
-model_nnature <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture, data = summary_nature)
-#summary(model_nnature)
-xkabledply(model_nnature, title = paste("Nature Caused:",format(formula(model_nnature)) ))
-plot(model_nnature)
-
-
-## Logn ~ nature variables        - PEOPLE CAUSED (P)
-model_npeople <- lm(log(n)~ Avg_Temp + Avg_SoilMoisture, data = summary_peoplecaused)
-#summary(model_npeople)
-xkabledply(model_npeople, title = paste("People Caused:",format(formula(model_npeople)) ))
-plot(model_npeople)
-```
-
-The first model with the total number of fires as the dependent variable had an adjusted R-squared value of `r format(model_nnature$r.squared *100)`%. This means that the environmental factors can explain 87% of the total variation in the number of fires when the fires were naturally caused. The R-squared value was `r format(model_npeople$r.squared *100)`% for the model where the fires were man-made. The coefficients of the independent variables showed that, for both the models, there was a direct relationship between the air temperature and the number of fires and the soil moisture and the number of fires. There was an indirect relationship between rainfall and the number of fires.
-
-## 3.2 Model for fire size
-
-```{r }
-
-## FIRE_SIZE ~ nature variables       - NATURE CAUSED (N)
-model_sizenature <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture , data = summary_nature)
-#summary(model_sizenature)
-xkabledply(model_sizenature, title = paste("Nature Caused:",format(formula(model_sizenature)) ))
-plot(model_sizenature)
-
-
-model_sizepeople <- lm(log(FIRE_SIZE) ~ Avg_Temp + Avg_SoilMoisture , data = summary_peoplecaused)
-#summary(model_sizepeople)
-xkabledply(model_sizepeople, title = paste("People Caused:",format(formula(model_sizepeople) )))
-plot(model_sizepeople)
-
-```
-
-Next, we modeled the environmental factors and their impact on the fire size. The environmental factors can explain `r format(model_sizenature$r.squared *100)`% of the variation in the fire size in the naturally caused fires model, whereas only `r format(model_sizepeople$r.squared *100)`% of the variation could be explained by those factors in the people caused fires model. The relationship of the independent variables was the same with the fire size as it was with the number of fires. 
-
-
-## 3.3 Model for burning area
-
-
-```{r }
-model_areanature <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = summary_nature)
-#summary(model_areanature)
-xkabledply(model_areanature, title = paste("Nature Caused:",format(formula(model_areanature)) ))
-plot(model_areanature)
-
-
-model_areapeople <- lm(log(FIRE_SIZE*n) ~ Avg_Temp + Avg_SoilMoisture , data = summary_peoplecaused)
-#summary(model_areapeople)
-xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model_areapeople) )))
-plot(model_areapeople)
-```
-
-Finally, we looked at the burn area and how environmental factors impact it. We found that `r format(model_areanature$r.squared *100)`% of the variation in burn size was explained in the naturally caused fires model, and `r format(model_areapeople$r.squared *100)`% was explained in the people caused fires model. Again, the relationship between the variables stayed consistent with previous models.  
-
-
-When looking at the difference in the impact of the fires based on their cause, the linear models showed that regardless of if the wildfire was started naturally or was manmade, since the relationship between the variables remained consistent, the impact of both kinds of wildfires was equally as devastating. 
 
 
 # 4 Decision Tree model for MultiClass Classification
