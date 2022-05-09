@@ -32,21 +32,6 @@ train <- fires[split,]
 test <- fires[-split,]
 ```
 
-```{R}
-budge <- read.csv("/Users/sumanth/Documents/GitHub/6101_Group5_Wildfires/fire_suppression.csv")
-budge$Budget <- as.numeric(gsub("[$,]", "", budge$Budget))
-budge$Budget <- budge$Budget / 1000000
-
-firesByYear <- fires %>% count(Year)
-firesBudget <- merge(firesByYear, budge, by="Year")
-
-ggplot(firesBudget, aes(x=Year, y=Budget)) + geom_bar(stat='identity') + ylim(0, max(budge$Budget)) + xlab("Year") +
-  ylab("Budget (in Billions $)") + ggtitle("California Wildfire Suppression Budget")
-
-ggplot(firesBudget) + geom_line(aes(x=Year, y=n), stat='identity', group=1) + xlab("Year") + ylab("Frequency") +
-  ggtitle("California Fire Frequency")
-```
-
 ```{r}
 model1 <- multinom(FIRE_SIZE_CLASS ~ tair_day_livneh_vic + 
                      soilmoist1_day_livneh_vic + 
@@ -70,24 +55,6 @@ ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
         scale_fill_gradient(low="white", high="#009194") +
         labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size")
 ```
-
-```{r}
-test$predictions <- predict(model1, newdata = test, "class")
-tab <- table(test$FIRE_SIZE_CLASS, test$predictions)
-round((sum(diag(tab))/sum(tab))*100,2)
-
-cm <- confusionMatrix(test$predictions, test$FIRE_SIZE_CLASS)
-
-cmdf <- as.data.frame(cm$table)
-cmdf$Prediction <- factor(cmdf$Prediction, levels=rev(levels(cmdf$Prediction)))
-
-ggplot(cmdf, aes(Reference,Prediction, fill= Freq)) +
-        geom_tile() + geom_text(aes(label=Freq)) +
-        scale_fill_gradient(low="white", high="#009194") +
-        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Fire Size")
-
-```
-
 ```{r}
 model2 <- multinom(STAT_CAUSE_CODE ~ month + tair_day_livneh_vic + 
                      soilmoist1_day_livneh_vic + 
@@ -107,27 +74,6 @@ tab <- table(train$STAT_CAUSE_CODE, train$predictions)
 round((sum(diag(tab))/sum(tab))*100,2)
 
 cm2 <- confusionMatrix(train$predictions, train$STAT_CAUSE_CODE)
-
-cm2df <- as.data.frame(cm2$table)
-cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
-
-ggplot(cm2df, aes(Prediction,Reference, fill= Freq)) +
-        geom_tile() + geom_text(aes(label=Freq)) +
-        scale_fill_gradient(low="white", high="#009194") +
-        labs(x = "Reference",y = "Prediction", title="Confusion Matrix for Predicted Causes")
-```
-
-```{r}
-# Predicting the values for train dataset
-test$predictions <- as.factor(predict(model2, newdata = test, "class"))
-
-# Building classification table
-tab <- table(test$STAT_CAUSE_CODE, test$predictions)
-
-# Calculating accuracy - sum of diagonal elements divided by total obs
-round((sum(diag(tab))/sum(tab))*100,2)
-
-cm2 <- confusionMatrix(test$predictions, test$STAT_CAUSE_CODE)
 
 cm2df <- as.data.frame(cm2$table)
 cm2df$Prediction <- factor(cm2df$Prediction, levels=rev(levels(cm2df$Prediction)))
