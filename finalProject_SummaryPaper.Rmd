@@ -162,7 +162,11 @@ xkabledply(model_npeople, title = paste("People Caused:",format(formula(model_np
 plot(model_npeople)
 ```
 
+<<<<<<< HEAD
 The first model with the total number of fires as the dependent variable had an adjusted adjusted R-squared value of  87% . This means that the environmental factors can explain 87% of the total variation in the number of fires when the fires were naturally caused. The adjusted R-squared value was 86.37% for the model where the fires were man-made. The coefficients of the independent variables showed that, for both the models, there was a direct relationship between the air temperature and the number of fires and the soil moisture and the number of fires. There was an indirect relationship between rainfall and the number of fires.
+=======
+The first model with the total number of fires as the dependent variable had an adjusted R-squared value of 87%. This means that the environmental factors can explain 87% of the total variation in the number of fires when the fires were naturally caused. The R-squared value was 86.37% for the model where the fires were man-made. The coefficients of the independent variables showed that, for both the models, there was a direct relationship between the air temperature and the number of fires and the soil moisture and the number of fires. There was an indirect relationship between rainfall and the number of fires.
+>>>>>>> AGnew
 
 ## 3.2 Model for fire size
 
@@ -201,7 +205,11 @@ xkabledply(model_areapeople, title = paste("People Caused:",format(formula(model
 plot(model_areapeople)
 ```
 
+<<<<<<< HEAD
 Finally, we looked at the burn area and how environmental factors impact it. We found that 75.69% of the variation in burn size was explained in the naturally caused fires model, and 70.43% was explained in the people caused fires model. Again, the relationship between the variables stayed consistent with previous models.  
+=======
+Finally, we looked at the burn area and how environmental factors impact it. We found that 75.69% of the variation in burn size was explained in the naturally caused fires model, and 70.43`% was explained in the people caused fires model. Again, the relationship between the variables stayed consistent with previous models.  
+>>>>>>> AGnew
 
 
 When looking at the difference in the impact of the fires based on their cause, the linear models showed that regardless of if the wildfire was started naturally or was manmade, since the relationship between the variables remained consistent, the impact of both kinds of wildfires was equally as devastating. 
@@ -514,7 +522,11 @@ By the plot check we found that the model of large fire case does not fit well a
 And the model of average large fire size result shows lack of some normality from qq-plot.
 
 
+<<<<<<< HEAD
 # 6. Decision Tree Model for MultiClass Classification
+=======
+# 6. Decision Tree model for MultiClass Classification
+>>>>>>> AGnew
 
 ## 6.1 Predicting all fire classes
 
@@ -629,7 +641,11 @@ confusionMatrix(data = predict_unseen, data_test$FIRE_SIZE_CLASS)
 Furthermore, after trying different values to manipulate the fit of the model, using minsplit, to include the minimum number of observations that must exist in a node for a split to be attempted, and In any terminal leaf node, minbucket the smallest amount of observations. If just one of minbucket or minsplit is supplied, the code sets minsplit to minbucket*3 or minbucket to minbucket/3, depending on the case. ‘cp’ This parameter's primary purpose is to reduce computation time by removing splits that are clearly not worth it. In essence, the user advises the computer that any split that does not enhance the fit by cp will most likely be trimmed out by cross-validation, and that the program does not need to pursue it further. We also did a accuracy tuning fit to improve the model fit. These models may have good potential in predicting the fire classes but in the case of larger fire classes, however, the lack of data remains a limitation for this research to train a model and produce accurate results. In our case, it is a good sign for fires to not be frequent in bigger classes. But, in the case of predicting larger fires, accurate predictions cannot be produced even after tuning the model.
 
 ## 6.3 Predicting fire classes A and B after tuning model fit
+<<<<<<< HEAD
 Finally, we ran the prediction again with the tuned model to test the fit after the tuning. The following parameters are used for tuning the model: minsplit = 4, minbucket = round(5 / 3), maxdepth = 3, cp = 0. After predicting the tuned model produced an accuracy with the same data set. Following is the model structure.
+=======
+Furthermore we ran the prediction again with the tuned model to test the fit after the tuning. The following parameters are used for tuning the model: minsplit = 4, minbucket = round(5 / 3), maxdepth = 3, cp = 0. After predicting the tuned model produced an accuracy with the same data set. Following is the model structure.
+>>>>>>> AGnew
 ```{r  echo=FALSE}
 predict_unseen2 <-predict(tune_fit, data_test, type = 'class')
 rpart.plot(tune_fit, extra = 106)
