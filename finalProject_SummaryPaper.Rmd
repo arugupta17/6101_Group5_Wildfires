@@ -518,7 +518,7 @@ And the model of average large fire size result shows lack of some normality fro
 ## 6.1 predicting all fire classes.
 
 
-```{r  echo=FALSE}
+```{r results='hide'}
 #install.packages("caret")
 library(rpart)
 library(rpart.plot)
@@ -558,7 +558,7 @@ data_train <- create_train_test(mdb, 0.8, train = TRUE)
 data_test <- create_train_test(mdb, 0.8, train = FALSE)
 data_test$FIRE_SIZE_CLASS = as.factor(data_test$FIRE_SIZE_CLASS)
 ```
- Following is the model structure.
+ These models have shown prominent results in trying to predict a certain class of fires. The first model while trying to predict all the fire classes did not show much promise in predicting the fires it had an accuracy of 52 percent which is slightly better than flipping a coin and trying to predict fire classes. Although accuracy was not the primary target of this model. The interest in these models comes from the structure as the models are tweaked and developed more there are many parameters and types of models that can be worked with for better models, this is evident when we tried to tune the model and managed to gain accuracy.Following is the model structure.
 ```{r  echo=FALSE}
 # specifying the technique which will be passed into the train() function later and number parameter is the "k" in K-fold cross validation
 train_control = trainControl(method = "cv", number = 5, search = "grid")
@@ -625,7 +625,7 @@ Next, the confusion matrix was plotted and it was found that this model produced
 # confusion Matrix
 confusionMatrix(data = predict_unseen, data_test$FIRE_SIZE_CLASS)
 ```
-Finally, after trying different values to manipulate the fit of the model, using minsplit, to include the minimum number of observations that must exist in a node for a split to be attempted, and In any terminal leaf node, minbucket the smallest amount of observations. If just one of minbucket or minsplit is supplied, the code sets minsplit to minbucket*3 or minbucket to minbucket/3, depending on the case. ‘cp’ This parameter's primary purpose is to reduce computation time by removing splits that are clearly not worth it. In essence, the user advises the computer that any split that does not enhance the fit by cp will most likely be trimmed out by cross-validation, and that the program does not need to pursue it further. Also did a accuracy tuning fit to improve the model fit.
+Finally, after trying different values to manipulate the fit of the model, using minsplit, to include the minimum number of observations that must exist in a node for a split to be attempted, and In any terminal leaf node, minbucket the smallest amount of observations. If just one of minbucket or minsplit is supplied, the code sets minsplit to minbucket*3 or minbucket to minbucket/3, depending on the case. ‘cp’ This parameter's primary purpose is to reduce computation time by removing splits that are clearly not worth it. In essence, the user advises the computer that any split that does not enhance the fit by cp will most likely be trimmed out by cross-validation, and that the program does not need to pursue it further. Also did a accuracy tuning fit to improve the model fit.These models may have good potential in predicting the fire classes but in the case of larger fire classes, the limitation is that most likely there will be not enough data for us to train a model and be confident in the model as of now and that would be a good thing for fires to be not frequent in bigger classes. But, in the case of predicting larger fires, we could not have good confidence in the model even after tuning.
 
 ## 6.3 predicting fire classes A and B after tuning model fit.
 Furthermore we ran the prediction again with the tuned model to test the fit after the tuning. The following parameters are used for tuning the model: minsplit = 4, minbucket = round(5 / 3), maxdepth = 3, cp = 0. After predicting the tuned model produced an accuracy with the same data set. Following is the model structure.
@@ -638,7 +638,7 @@ rpart.plot(tune_fit, extra = 106)
 # confusion Matrix
 confusionMatrix(data = predict_unseen2, data_test$FIRE_SIZE_CLASS)
 ```
-We noticed an increase in the accuracy of this model in the above confusion matrix and summary statistics plot. (4.3.2, Confusion and stats plot)We were able to predict that the smaller, and the more frequent fire classes with the best accuracy of 57% through this model. However, predicting larger fires continue to be a challenge due to the imbalance in the dataset.
+We noticed an increase in the accuracy of this model in the above confusion matrix and summary statistics plot. (4.3.2, Confusion and stats plot)We were able to predict that the smaller, and the more frequent fire classes with the best accuracy of 57% through this model. However, predicting larger fires continue to be a challenge due to the imbalance in the dataset.For larger classes, the other models would do better. When closely looking at the models through many of the variations I have tried I’ve noticed that the deeper nodes in almost all the models branch at a clause with soil moisture and air temperature. This shows that soil moisture is a strong factor when looking for fire classes, fire class in another sense is the area of fire spread and burnt, this finding is credible because with low soil moisture value the fire is easily spread on the ground even with the countermeasures are in place.
 ```{r , echo=FALSE}
 ```
 
