@@ -118,7 +118,7 @@ budge <- read.csv("fire_suppression.csv")
 budge$Budget <- as.numeric(gsub("[$,]", "", budge$Budget))
 budge$Budget <- budge$Budget / 1000000
 
-firesByYear <- fires %>% count(Year)
+firesByYear <- data_wildfire %>% count(Year)
 firesBudget <- merge(firesByYear, budge, by="Year")
 
 ggplot(firesBudget, aes(x=Year, y=Budget)) + geom_bar(stat='identity') + ylim(0, max(budge$Budget)) + xlab("Year") +
@@ -348,10 +348,9 @@ Next, we used multinomial regression to predict characteristics of different wil
 ```{r}
 data_wildfire$STAT_CAUSE_CODE <- as.factor(data_wildfire$STAT_CAUSE_CODE)
 data_wildfire$FIRE_SIZE_CLASS <- as.factor(data_wildfire$FIRE_SIZE_CLASS)
-temp8= subset(data_wildfire, FIRE_SIZE_CLASS != 'A' & FIRE_SIZE_CLASS != 'B')
-split <- createDataPartition(fires$FIRE_SIZE_CLASS, p = .70, list = FALSE)
-train <- fires[split,]
-test <- fires[-split,]
+split <- createDataPartition(data_wildfire$FIRE_SIZE_CLASS, p = .70, list = FALSE)
+train <- data_wildfire[split,]
+test <- data_wildfire[-split,]
 ```
 
 For these models, the independent variables were rainfall, air temperature, and soil moisture, and the dependent variable was fire size class. There are two main categorical variables of interest in this model: fire cause and fire class size. The first model produced a lower accuracy of 30%. Taking a deeper look at it, a lower accuracy score makes sense. Among 13 causes, most of the wildfires were a result of three main causes - lightning, debris burning, and “miscellaneous” with miscellaneous being the most popular cause. 27% of the wildfire records fell into this category, which is a large share compared to the other causes; lightning accounted for 14% of fires, while debris burning accounted for 7%. Other causes of wildfires were not nearly as frequent, which resulted in the model being biased towards predicting that the fires were caused by lighting, debris burning, or “miscellaneous” reasons. 
@@ -359,7 +358,7 @@ For these models, the independent variables were rainfall, air temperature, and 
 ```{r}
 model1 <- multinom(FIRE_SIZE_CLASS ~ month + tair_day_livneh_vic + 
                      soilmoist1_day_livneh_vic + 
-                     rainfall_day_livneh_vic, data = fires)
+                     rainfall_day_livneh_vic, data = data_wildfire)
 summary(model1)
 ```
 
@@ -415,7 +414,7 @@ model2 <- multinom(STAT_CAUSE_CODE ~ tair_day_livneh_vic +
 summary(model2)
 
 # train model on training set
-train$predictions <- predict(model1, newdata = train, "class")
+train$predictions <- predict(model2, newdata = train, "class")
 
 # Create confusion matrix based on training set's accuracy
 cm <- confusionMatrix(train$predictions, train$STAT_CAUSE_CODE)
