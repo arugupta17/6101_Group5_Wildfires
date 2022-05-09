@@ -684,5 +684,7 @@ California’s fire suppression data was also not granular enough in that it did
 
 # 9. References: 
                  
-
+1.88 million US wildfires. Kaggle. (n.d.). Retrieved May 8, 2022, from https://www.kaggle.com/rtatman/188-million-us-wildfires 
+Adapt. Cal. (n.d.). Retrieved May 8, 2022, from https://cal-adapt.org/data/download/ 
+California Department of Forestry and Fire Protection (CAL FIRE). (n.d.). Cal fire. Cal Fire Department of Forestry and Fire Protection. Retrieved May 8, 2022, from https://www.fire.ca.gov/ 
 
